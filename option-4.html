@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>值班教练反馈</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --mcd-yellow: #FFBC0D;
+  --mcd-yellow-light: #FFF8E1;
+  --mcd-yellow-pale: #FFFBEF;
+  --mcd-red: #DA291C;
+  --mcd-dark: #292929;
+  --mcd-gray-700: #555;
+  --mcd-gray-500: #888;
+  --mcd-gray-400: #AAA;
+  --mcd-gray-200: #E5E5E5;
+  --mcd-gray-100: #F5F5F5;
+  --mcd-bg: #F2F2F2;
+  --mcd-white: #FFF;
+  --mcd-green: #34A853;
+  --mcd-green-light: #E8F5E9;
+  --mcd-orange: #FF8C00;
+  --mcd-blue: #4285F4;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.06);
+  --font: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dark); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+/* ===== Status & Nav ===== */
+.status-bar { height: calc(44px + var(--safe-top)); padding-top: var(--safe-top); background: var(--mcd-yellow); position: sticky; top: 0; z-index: 100; }
+.nav-bar { background: var(--mcd-yellow); padding: 0 16px 12px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: calc(44px + var(--safe-top)); z-index: 99; }
+.nav-bar__back { display: flex; align-items: center; gap: 4px; background: none; border: none; font-size: 17px; font-weight: 600; color: var(--mcd-dark); cursor: pointer; padding: 8px 4px; }
+.nav-bar__back svg { width: 20px; height: 20px; }
+.nav-bar__actions { display: flex; gap: 12px; }
+.nav-bar__btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.08); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.nav-bar__btn:active { background: rgba(0,0,0,0.15); }
+.nav-bar__btn svg { width: 18px; height: 18px; }
+
+/* ===== Phase Tabs ===== */
+.phase-tabs { background: var(--mcd-yellow); padding: 0 16px 14px; display: flex; gap: 0; position: sticky; top: calc(88px + var(--safe-top)); z-index: 98; }
+.phase-tab { flex: 1; text-align: center; font-size: 13px; font-weight: 500; color: rgba(41,41,41,0.55); padding: 8px 0; background: none; border: none; cursor: pointer; position: relative; }
+.phase-tab.active { color: var(--mcd-dark); font-weight: 700; }
+.phase-tab.active::after { content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; height: 3px; background: var(--mcd-dark); border-radius: 2px; }
+.phase-tab .check { font-size: 11px; margin-left: 2px; }
+
+.content { padding: 16px; padding-bottom: calc(100px + var(--safe-bottom)); }
+.card { background: var(--mcd-white); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); animation: fadeInUp 0.4s ease backwards; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== 值班总览 Section ===== */
+.overview-card { background: var(--mcd-white); border-radius: var(--radius-lg); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: hidden; animation: fadeInUp 0.4s ease backwards; }
+.overview-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px; }
+.overview-header__left { display: flex; align-items: center; gap: 8px; }
+.overview-header__icon { width: 28px; height: 28px; }
+.overview-header__title { font-size: 18px; font-weight: 700; }
+.overview-header__toggle { background: none; border: none; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
+.overview-header__toggle.collapsed { transform: rotate(180deg); }
+.overview-header__toggle svg { width: 20px; height: 20px; color: var(--mcd-gray-500); }
+.overview-body { padding: 0 20px 20px; transition: max-height 0.35s ease, opacity 0.25s ease; overflow: hidden; }
+.overview-body.collapsed { max-height: 0 !important; padding: 0 20px; opacity: 0; }
+
+/* AI Summary */
+.ai-summary { background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,188,13,0.15); }
+.ai-summary__header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+.ai-summary__icon { font-size: 18px; }
+.ai-summary__label { font-size: 15px; font-weight: 700; color: var(--mcd-dark); }
+.ai-summary__text { font-size: 13px; color: var(--mcd-gray-700); line-height: 1.8; }
+.ai-summary__toggle { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; padding: 6px; background: none; border: none; cursor: pointer; font-size: 12px; color: var(--mcd-gray-500); width: 100%; }
+
+/* Dimension Blocks */
+.dim-block { background: var(--mcd-gray-100); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
+.dim-block:last-child { margin-bottom: 0; }
+.dim-block__header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.dim-block__icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dim-block__icon--sales { background: #FFF0D4; }
+.dim-block__icon--csat { background: #E3F2FD; }
+.dim-block__icon--staff { background: #FCE4EC; }
+.dim-block__icon--perf { background: #E8F5E9; }
+.dim-block__icon svg { width: 18px; height: 18px; }
+.dim-block__title { font-size: 15px; font-weight: 700; }
+
+/* Metric Row */
+.metric-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--mcd-gray-200); }
+.metric-row:last-child { border-bottom: none; }
+.metric-row__left { flex: 1; }
+.metric-row__label { font-size: 13px; color: var(--mcd-gray-500); margin-bottom: 2px; }
+.metric-row__sub { font-size: 11px; color: var(--mcd-gray-400); }
+.metric-row__right { display: flex; align-items: baseline; gap: 8px; text-align: right; }
+.metric-row__value { font-size: 20px; font-weight: 700; color: var(--mcd-dark); }
+.metric-row__target { font-size: 12px; color: var(--mcd-gray-500); }
+.metric-row__diff { font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+.metric-row__diff--up { color: var(--mcd-green); background: var(--mcd-green-light); }
+.metric-row__diff--down { color: var(--mcd-red); background: #FFEBEE; }
+.metric-row__diff--neutral { color: var(--mcd-gray-500); background: var(--mcd-gray-100); }
+
+/* Peak Time Slots */
+.peak-slots { margin-top: 8px; }
+.peak-slot { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; background: var(--mcd-white); }
+.peak-slot__time { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.peak-slot__dot { width: 8px; height: 8px; border-radius: 50%; }
+.peak-slot__dot--green { background: var(--mcd-green); }
+.peak-slot__dot--yellow { background: var(--mcd-yellow); }
+.peak-slot__dot--orange { background: var(--mcd-orange); }
+.peak-slot__dot--red { background: var(--mcd-red); }
+.peak-slot__right { display: flex; align-items: center; gap: 10px; }
+.peak-slot__val { font-size: 15px; font-weight: 700; }
+.peak-slot__info { font-size: 11px; color: var(--mcd-gray-500); }
+.peak-slot__diff { font-size: 12px; font-weight: 600; }
+.peak-slot__diff--up { color: var(--mcd-green); }
+.peak-slot__diff--down { color: var(--mcd-red); }
+
+/* Staff metric special */
+.staff-metric { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+.staff-metric__big { font-size: 28px; font-weight: 900; color: var(--mcd-dark); }
+.staff-metric__sep { font-size: 20px; color: var(--mcd-gray-400); }
+.staff-metric__small { font-size: 16px; color: var(--mcd-gray-500); }
+.staff-metric__label { font-size: 12px; color: var(--mcd-gray-500); }
+
+/* Completion bars */
+.completion-row { display: flex; gap: 12px; }
+.completion-item { flex: 1; }
+.completion-item__label { font-size: 12px; color: var(--mcd-gray-500); margin-bottom: 6px; }
+.completion-item__bar { height: 8px; background: var(--mcd-gray-200); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
+.completion-item__fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.completion-item__fill--green { background: var(--mcd-green); }
+.completion-item__fill--yellow { background: var(--mcd-yellow); }
+.completion-item__val { font-size: 14px; font-weight: 700; }
+
+/* CCC */
+.ccc-empty { font-size: 13px; color: var(--mcd-gray-400); padding: 4px 0; }
+
+/* ===== Person Card ===== */
+.person-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.person-header__title { font-size: 18px; font-weight: 700; }
+.person-header__link { display: flex; align-items: center; gap: 2px; background: var(--mcd-dark); color: var(--mcd-white); font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 20px; border: none; cursor: pointer; }
+.person-header__link:active { opacity: 0.8; }
+.person-header__link svg { width: 14px; height: 14px; }
+.person-info { display: flex; align-items: center; gap: 14px; }
+.person-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--mcd-yellow-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.person-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.person-meta { font-size: 13px; color: var(--mcd-gray-500); display: flex; gap: 16px; }
+.section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+/* ===== SBIA Card ===== */
+.sbia-card { background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid rgba(255,188,13,0.2); }
+.sbia-card__title { font-size: 16px; font-weight: 700; color: #292929; margin-bottom: 10px; }
+.sbia-card__badge { background: #FFBC0D; color: #292929; text-align: center; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
+.sbia-card__flow { display: flex; align-items: flex-start; justify-content: center; gap: 4px; }
+.sbia-card__step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sbia-card__icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.sbia-card__icon--s { background: #9E9E9E; }
+.sbia-card__icon--b { background: #616161; }
+.sbia-card__icon--i { background: #DA291C; }
+.sbia-card__icon--a { background: #EE3A2C; }
+.sbia-card__label { font-size: 13px; font-weight: 700; color: #292929; }
+.sbia-card__sub { font-size: 10px; color: #888; }
+.sbia-card__arrow { color: #CCC; font-size: 16px; padding-top: 12px; flex-shrink: 0; }
+
+/* ===== Tabs & Feedback ===== */
+.tab-bar { display: flex; gap: 0; background: var(--mcd-gray-100); border-radius: 10px; padding: 3px; margin-bottom: 20px; }
+.tab-item { flex: 1; padding: 10px 8px; text-align: center; font-size: 13px; font-weight: 600; color: var(--mcd-gray-500); background: none; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.tab-item.active { color: var(--mcd-dark); background: var(--mcd-white); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.tab-item__dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.tab-item__dot--green { background: var(--mcd-green); }
+.tab-item__dot--orange { background: var(--mcd-orange); }
+.tab-item__dot--blue { background: var(--mcd-blue); }
+.tab-item__check { width: 16px; height: 16px; border-radius: 50%; background: var(--mcd-green); display: none; align-items: center; justify-content: center; flex-shrink: 0; }
+.tab-item__check svg { width: 10px; height: 10px; }
+.tab-item.completed .tab-item__check { display: flex; }
+.feedback-panel { display: none; }
+.feedback-panel.active { display: block; animation: panelIn 0.25s ease; }
+@keyframes panelIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+.fp__header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.fp__ind { width: 3px; height: 18px; border-radius: 2px; flex-shrink: 0; align-self: center; }
+.fp__ind--g { background: var(--mcd-green); }
+.fp__ind--o { background: var(--mcd-orange); }
+.fp__ind--b { background: var(--mcd-blue); }
+.fp__title { font-size: 16px; font-weight: 700; }
+.fp__sub { font-size: 13px; color: var(--mcd-gray-500); margin-bottom: 14px; padding-left: 11px; }
+.tags-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+.tag { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 20px; border: 1.5px solid var(--mcd-gray-200); background: var(--mcd-white); font-size: 12px; color: var(--mcd-gray-700); cursor: pointer; transition: all 0.2s ease; user-select: none; flex-shrink: 0; }
+.tag:active { transform: scale(0.96); }
+.tag__check { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--mcd-gray-400); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
+.tag__check svg { width: 8px; height: 8px; opacity: 0; transition: opacity 0.15s; }
+.tag.active { border-color: var(--mcd-yellow); background: var(--mcd-yellow-pale); color: var(--mcd-dark); font-weight: 500; }
+.tag.active .tag__check { background: var(--mcd-yellow); border-color: var(--mcd-yellow); }
+.tag.active .tag__check svg { opacity: 1; }
+.textarea-wrap textarea { width: 100%; min-height: 180px; padding: 14px; border: 1.5px solid var(--mcd-gray-200); border-radius: var(--radius-md); font-family: var(--font); font-size: 14px; color: var(--mcd-dark); background: var(--mcd-white); resize: none; outline: none; transition: border-color 0.2s; line-height: 1.6; -webkit-appearance: none; }
+.textarea-wrap textarea::placeholder { color: var(--mcd-gray-400); font-size: 13px; }
+.textarea-wrap textarea:focus { border-color: var(--mcd-yellow); box-shadow: 0 0 0 3px rgba(255,188,13,0.15); }
+.textarea-wrap textarea:disabled { background: var(--mcd-gray-100); color: var(--mcd-gray-400); cursor: not-allowed; }
+.guide-text { font-size: 13px; color: var(--mcd-gray-500); line-height: 1.6; margin-bottom: 8px; white-space: pre-line; display: none; }
+.guide-text.visible { display: block; }
+.submit-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px; padding-bottom: calc(12px + var(--safe-bottom)); background: var(--mcd-white); box-shadow: 0 -2px 10px rgba(0,0,0,0.06); z-index: 50; }
+.submit-btn { width: 100%; padding: 14px; border: none; border-radius: 28px; background: var(--mcd-yellow); color: var(--mcd-dark); font-family: var(--font); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+.submit-btn:active { transform: scale(0.98); background: #E8AB00; }
+.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.85); background: rgba(0,0,0,0.75); color: white; padding: 14px 28px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; z-index: 400; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
+.toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.divider { height: 1px; background: var(--mcd-gray-200); margin: 0 0 20px 0; }
+</style>
+</head>
+<body>
+<div class="status-bar"></div>
+<nav class="nav-bar">
+  <button class="nav-bar__back" aria-label="返回">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    值班教练反馈
+  </button>
+  <div class="nav-bar__actions">
+    <button class="nav-bar__btn" aria-label="更多"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    <button class="nav-bar__btn" aria-label="拍照"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</nav>
+
+<!-- Phase Tabs -->
+<div class="phase-tabs">
+  <button class="phase-tab">值班前24小时 <span class="check">✓</span></button>
+  <button class="phase-tab">值班前30分钟 <span class="check">✓</span></button>
+  <button class="phase-tab active">值班中 <span class="check">✓</span></button>
+  <button class="phase-tab">值班后 <span class="check">✓</span></button>
+</div>
+
+<main class="content">
+
+  <!-- ========== 值班总览 ========== -->
+  <div class="overview-card" id="overviewCard">
+    <div class="overview-header">
+      <div class="overview-header__left">
+        <!-- StoreOverview icon -->
+        <svg class="overview-header__icon" viewBox="64 64 896 896" fill="#FFBC0D"><path d="M512 128c-212.08 0-384 171.92-384 384s171.92 384 384 384 384-171.92 384-384-171.92-384-384-384zm0 704c-176.73 0-320-143.27-320-320S335.27 192 512 192s320 143.27 320 320-143.27 320-320 320zm-32-512h64v192h-64zm0 256h64v64h-64z"/></svg>
+        <h2 class="overview-header__title">数据总览</h2>
+      </div>
+      <button class="overview-header__toggle" id="overviewToggle" aria-label="收起/展开">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+    <div class="overview-body" id="overviewBody">
+
+      <!-- AI 总结 -->
+      <div class="ai-summary" id="aiSummary">
+        <div class="ai-summary__header">
+          <span class="ai-summary__icon">✨</span>
+          <span class="ai-summary__label">AI 总结</span>
+        </div>
+        <div class="ai-summary__text" id="aiText">
+          本班次<b>业务达成表现优异</b>，Sales 达 12940 元超出目标 13622 元的预期节奏，尖峰 GC 达 346 略低于目标 358，其中 11:00-12:00 时段表现突出（108 vs 目标 77）。<b>客户满意度 OSAT 100%</b>，无客诉记录，非常棒！员工认知方面，本班次认知了 <b>3/12</b> 位员工，建议关注更多员工的表现并给予认可。值班工具完成率 85%，基础任务完成率 92%，整体值班表现良好，继续保持！
+        </div>
+        <button class="ai-summary__toggle" id="aiToggle">
+          <span id="aiToggleText">收起</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <!-- 维度1: 业务达成 -->
+      <div class="dim-block">
+        <div class="dim-block__header">
+          <div class="dim-block__icon dim-block__icon--sales">
+            <svg viewBox="64 64 896 896" fill="#FF8C00"><path d="M848 512a5.33 5.33 0 015.33 5.33v341.34A37.33 37.33 0 01816 896h-32a5.33 5.33 0 01-5.34-5.33V549.27A37.33 37.33 0 01816 512h32zm-203 69a5.33 5.33 0 015.34 5.34v267.44A37.33 37.33 0 01613 891h-32a5.33 5.33 0 01-5.33-5.33V618.09A37.33 37.33 0 01613 581h32zm-235-117a37.33 37.33 0 0137.34 37.33v384a5.33 5.33 0 01-5.33 5.33h-32a37.33 37.33 0 01-37.33-37.33v-384a5.33 5.33 0 015.33-5.33h32zM240 683a5.33 5.33 0 015.34 5.33v163.1A37.33 37.33 0 01208 889h-32a5.33 5.33 0 01-5.33-5.33V720A37.33 37.33 0 01208 683h32z"/></svg>
+          </div>
+          <span class="dim-block__title">🔥 业务达成</span>
+        </div>
+
+        <!-- Sales -->
+        <div class="metric-row">
+          <div class="metric-row__left">
+            <div class="metric-row__label">班次 Sales</div>
+            <div class="metric-row__sub">vs. 目标 13622</div>
+          </div>
+          <div class="metric-row__right">
+            <span class="metric-row__value">12940</span>
+            <span class="metric-row__diff metric-row__diff--down">↓ 682</span>
+          </div>
+        </div>
+
+        <!-- Sales by BE -->
+        <div style="padding-left:8px; margin-top:4px;">
+          <div class="metric-row">
+            <div class="metric-row__left"><div class="metric-row__label">FC Sales</div><div class="metric-row__sub">vs. 目标 5500</div></div>
+            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">5284</span><span class="metric-row__diff metric-row__diff--down">↓ 216</span></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-row__left"><div class="metric-row__label">MDS Sales</div><div class="metric-row__sub">vs. 目标 6200</div></div>
+            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">6503</span><span class="metric-row__diff metric-row__diff--up">↑ 303</span></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-row__left"><div class="metric-row__label">Kiosk Sales</div><div class="metric-row__sub">vs. 目标 50</div></div>
+            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">46</span><span class="metric-row__diff metric-row__diff--down">↓ 4</span></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric-row__left"><div class="metric-row__label">McCafe Sales</div><div class="metric-row__sub">vs. 目标 1150</div></div>
+            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">1107</span><span class="metric-row__diff metric-row__diff--down">↓ 43</span></div>
+          </div>
+        </div>
+
+        <!-- Peak GC -->
+        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--mcd-gray-200);">
+          <div class="metric-row">
+            <div class="metric-row__left">
+              <div class="metric-row__label">挑战尖峰 GC</div>
+              <div class="metric-row__sub">vs. 目标 358</div>
+            </div>
+            <div class="metric-row__right">
+              <span class="metric-row__value">346</span>
+              <span class="metric-row__diff metric-row__diff--down">↓ 12</span>
+            </div>
+          </div>
+          <div class="peak-slots">
+            <div class="peak-slot">
+              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--green"></span>08:00-09:00</div>
+              <div class="peak-slot__right">
+                <div><span class="peak-slot__val">105</span><div class="peak-slot__info">vs.目标 123</div></div>
+                <span class="peak-slot__diff peak-slot__diff--down">↓ 18</span>
+              </div>
+            </div>
+            <div class="peak-slot">
+              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--yellow"></span>11:00-12:00</div>
+              <div class="peak-slot__right">
+                <div><span class="peak-slot__val">108</span><div class="peak-slot__info">vs.目标 77</div></div>
+                <span class="peak-slot__diff peak-slot__diff--up">↑ 31</span>
+              </div>
+            </div>
+            <div class="peak-slot">
+              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--orange"></span>12:00-13:00</div>
+              <div class="peak-slot__right">
+                <div><span class="peak-slot__val">100</span><div class="peak-slot__info">vs.目标 119</div></div>
+                <span class="peak-slot__diff peak-slot__diff--down">↓ 19</span>
+              </div>
+            </div>
+            <div class="peak-slot">
+              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--red"></span>13:00-14:00</div>
+              <div class="peak-slot__right">
+                <div><span class="peak-slot__val">33</span><div class="peak-slot__info">vs.目标 39</div></div>
+                <span class="peak-slot__diff peak-slot__diff--down">↓ 6</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R2P -->
+        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--mcd-gray-200);">
+          <div class="metric-row">
+            <div class="metric-row__left"><div class="metric-row__label">R2P</div><div class="metric-row__sub">班次平均</div></div>
+            <div class="metric-row__right"><span class="metric-row__value">3.2<span style="font-size:13px;color:var(--mcd-gray-500);">min</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 维度2: 客户满意 -->
+      <div class="dim-block">
+        <div class="dim-block__header">
+          <div class="dim-block__icon dim-block__icon--csat">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#4285F4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zm1-2h2v-2H8v2zm6 0h2v-2h-2v2z"/></svg>
+          </div>
+          <span class="dim-block__title">👍 客户满意</span>
+        </div>
+        <div class="metric-row">
+          <div class="metric-row__left">
+            <div class="metric-row__label">班次 OSAT (00:00-14:00)</div>
+            <div class="metric-row__sub">vs. 目标 100%</div>
+          </div>
+          <div class="metric-row__right">
+            <span class="metric-row__value">100<span style="font-size:14px;">%</span></span>
+            <span class="metric-row__diff metric-row__diff--neutral">— 0</span>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="metric-row__left">
+            <div class="metric-row__label">CCC 客诉</div>
+          </div>
+          <div class="metric-row__right">
+            <span class="ccc-empty">该班次无客诉 ✓</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 维度3: 员工满意 -->
+      <div class="dim-block">
+        <div class="dim-block__header">
+          <div class="dim-block__icon dim-block__icon--staff">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#E91E63"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <span class="dim-block__title">😊 员工满意</span>
+        </div>
+        <div class="staff-metric">
+          <div style="text-align:center;">
+            <div><span class="staff-metric__big">3</span><span class="staff-metric__sep"> / </span><span class="staff-metric__small">12</span></div>
+            <div class="staff-metric__label">认知员工 / 班次员工</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 维度4: 值班表现 -->
+      <div class="dim-block">
+        <div class="dim-block__header">
+          <div class="dim-block__icon dim-block__icon--perf">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="#34A853"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+          </div>
+          <span class="dim-block__title">📋 值班表现</span>
+        </div>
+        <div class="completion-row">
+          <div class="completion-item">
+            <div class="completion-item__label">基础任务完成率</div>
+            <div class="completion-item__bar"><div class="completion-item__fill completion-item__fill--green" style="width:92%;"></div></div>
+            <div class="completion-item__val">92%</div>
+          </div>
+          <div class="completion-item">
+            <div class="completion-item__label">值班工具完成率</div>
+            <div class="completion-item__bar"><div class="completion-item__fill completion-item__fill--yellow" style="width:85%;"></div></div>
+            <div class="completion-item__val">85%</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========== 人员信息 ========== -->
+  <section class="card">
+    <div class="person-header">
+      <h2 class="person-header__title">人员信息</h2>
+      <button class="person-header__link">值班情况<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </div>
+    <div class="person-info">
+      <div class="person-avatar"><svg viewBox="0 0 24 24" width="32" height="32" fill="#FFBC0D" stroke="none"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+      <div>
+        <div class="person-name">刘翠翠 (Patrick Chen)</div>
+        <div class="person-meta"><span>工号：10065998</span><span>值班时间：2024.09.08</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 教练反馈 ========== -->
+  <section class="card">
+    <h2 class="section-title">教练反馈</h2>
+    <div class="sbia-card">
+      <div class="sbia-card__title">SBIA反馈</div>
+      <div class="sbia-card__badge">总结陈述</div>
+      <div class="sbia-card__flow">
+        <div class="sbia-card__step">
+          <div class="sbia-card__icon sbia-card__icon--s"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+          <div class="sbia-card__label">情景</div>
+          <div class="sbia-card__sub">Situation</div>
+        </div>
+        <div class="sbia-card__arrow">→</div>
+        <div class="sbia-card__step">
+          <div class="sbia-card__icon sbia-card__icon--b"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
+          <div class="sbia-card__label">行为</div>
+          <div class="sbia-card__sub">Behavior</div>
+        </div>
+        <div class="sbia-card__arrow">→</div>
+        <div class="sbia-card__step">
+          <div class="sbia-card__icon sbia-card__icon--i"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+          <div class="sbia-card__label">影响</div>
+          <div class="sbia-card__sub">Impact</div>
+        </div>
+        <div class="sbia-card__arrow">→</div>
+        <div class="sbia-card__step">
+          <div class="sbia-card__icon sbia-card__icon--a"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1z"/></svg></div>
+          <div class="sbia-card__label">行动</div>
+          <div class="sbia-card__sub">Action</div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+    <!-- Tab Switcher -->
+    <div class="tab-bar">
+      <button class="tab-item active" data-tab="dowell"><span class="tab-item__dot tab-item__dot--green"></span>Do Well<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+      <button class="tab-item" data-tab="dobetter"><span class="tab-item__dot tab-item__dot--orange"></span>Do Better<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+      <button class="tab-item" data-tab="donext"><span class="tab-item__dot tab-item__dot--blue"></span>Do Next<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+    </div>
+
+    <div class="feedback-panel active" id="panel-dowell">
+      <div class="fp__header"><span class="fp__ind fp__ind--g"></span><span class="fp__title">Do Well!</span></div>
+      <p class="fp__sub">做得好的，继续保持的方面！</p>
+      <div class="tags-row">
+        <button class="tag" data-tag="顾客体验" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
+        <button class="tag" data-tag="员工体验" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
+        <button class="tag" data-tag="业务达成" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
+      </div>
+      <div class="guide-text" data-guide="dowell"></div>
+      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="dowell"></textarea></div>
+    </div>
+
+    <div class="feedback-panel" id="panel-dobetter">
+      <div class="fp__header"><span class="fp__ind fp__ind--o"></span><span class="fp__title">Do Better!</span></div>
+      <p class="fp__sub">可以做得更好的，有待改进的方面！</p>
+      <div class="tags-row">
+        <button class="tag" data-tag="顾客体验" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
+        <button class="tag" data-tag="员工体验" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
+        <button class="tag" data-tag="业务达成" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
+      </div>
+      <div class="guide-text" data-guide="dobetter"></div>
+      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="dobetter"></textarea></div>
+    </div>
+
+    <div class="feedback-panel" id="panel-donext">
+      <div class="fp__header"><span class="fp__ind fp__ind--b"></span><span class="fp__title">Do Next!</span></div>
+      <p class="fp__sub">下一步行动，从哪些行为方面做出改变？</p>
+      <div class="tags-row">
+        <button class="tag" data-tag="顾客体验" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
+        <button class="tag" data-tag="员工体验" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
+        <button class="tag" data-tag="业务达成" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
+      </div>
+      <div class="guide-text" data-guide="donext"></div>
+      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="donext"></textarea></div>
+    </div>
+  </section>
+</main>
+<div class="submit-bar"><button class="submit-btn" id="submitBtn">下一个</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== Overview toggle =====
+var overviewToggle = document.getElementById('overviewToggle');
+var overviewBody = document.getElementById('overviewBody');
+overviewToggle.addEventListener('click', function() {
+  this.classList.toggle('collapsed');
+  overviewBody.classList.toggle('collapsed');
+});
+
+// ===== AI Summary toggle =====
+var aiToggle = document.getElementById('aiToggle');
+var aiText = document.getElementById('aiText');
+var aiToggleText = document.getElementById('aiToggleText');
+var aiExpanded = true;
+aiToggle.addEventListener('click', function() {
+  aiExpanded = !aiExpanded;
+  aiText.style.display = aiExpanded ? 'block' : 'none';
+  aiToggleText.textContent = aiExpanded ? '收起' : '展开';
+  this.querySelector('svg').style.transform = aiExpanded ? '' : 'rotate(180deg)';
+});
+
+// ===== Feedback logic (same as option-3) =====
+var GUIDE_MAP = {
+  '顾客体验': ['顾客满意度', '服务效率', '问题解决', '顾客互动'],
+  '员工体验': ['工作积极性', '团队协作', '员工关怀', '训练成长'],
+  '业务达成': ['营业额达成', '食品安全', '运营效率', '成本管控']
+};
+var BLOCK_SUFFIX = { dowell: '等方面夸夸！', dobetter: '等方面聊聊！', donext: '等方面制定计划！' };
+var TABS = ['dowell', 'dobetter', 'donext'];
+var state = { dowell: new Set(), dobetter: new Set(), donext: new Set() };
+var userContent = { dowell: '', dobetter: '', donext: '' };
+var currentTab = 'dowell';
+
+function switchTab(tabId) {
+  currentTab = tabId;
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.tab-item[data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelectorAll('.feedback-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + tabId).classList.add('active');
+  updateSubmitBtn();
+}
+
+document.querySelectorAll('.tab-item').forEach(function(tab) {
+  tab.addEventListener('click', function() { switchTab(this.dataset.tab); });
+});
+
+document.querySelectorAll('.tag').forEach(function(tag) {
+  tag.addEventListener('click', function() {
+    var blockId = this.dataset.blockId, tagName = this.dataset.tag;
+    if (state[blockId].has(tagName)) { state[blockId].delete(tagName); this.classList.remove('active'); }
+    else { state[blockId].add(tagName); this.classList.add('active'); }
+    updateTextarea(blockId);
+    updateSubmitBtn();
+  });
+});
+
+function updateTextarea(blockId) {
+  var ta = document.querySelector('textarea[data-block-id="' + blockId + '"]');
+  var guideEl = document.querySelector('.guide-text[data-guide="' + blockId + '"]');
+  var tags = Array.from(state[blockId]);
+  if (tags.length === 0) {
+    guideEl.textContent = ''; guideEl.classList.remove('visible');
+    if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写'; }
+    ta.disabled = true; return;
+  }
+  guideEl.textContent = buildGuide(blockId, tags);
+  guideEl.classList.add('visible');
+  ta.disabled = false;
+  if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请在此输入反馈内容...'; ta.style.color = ''; }
+}
+
+function buildGuide(blockId, tags) {
+  var suffix = BLOCK_SUFFIX[blockId];
+  return tags.map(function(t) { return '• ' + t + '：从' + (GUIDE_MAP[t] || []).join('、') + suffix; }).join('\n');
+}
+
+document.querySelectorAll('textarea').forEach(function(ta) {
+  var blockId = ta.dataset.blockId;
+  if (!blockId) return;
+  ta.addEventListener('blur', function() { userContent[blockId] = this.value; updateCompleted(blockId); updateSubmitBtn(); });
+  ta.addEventListener('input', function() {
+    userContent[blockId] = this.value; this.style.color = '';
+    this.style.height = 'auto'; this.style.height = Math.max(180, this.scrollHeight) + 'px';
+    updateCompleted(blockId); updateSubmitBtn();
+  });
+});
+
+function isBlockCompleted(blockId) { return userContent[blockId].trim().length > 0 && state[blockId].size > 0; }
+function updateCompleted(blockId) {
+  var tab = document.querySelector('.tab-item[data-tab="' + blockId + '"]');
+  if (isBlockCompleted(blockId)) tab.classList.add('completed'); else tab.classList.remove('completed');
+}
+
+var submitBtn = document.getElementById('submitBtn');
+function updateSubmitBtn() {
+  var allDone = TABS.every(isBlockCompleted);
+  submitBtn.textContent = allDone ? '去提交' : '下一个';
+}
+
+submitBtn.addEventListener('click', function() {
+  var allDone = TABS.every(isBlockCompleted);
+  if (allDone) {
+    var t = document.getElementById('toast'); t.textContent = '反馈提交成功 ✓';
+    t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 2000);
+    return;
+  }
+  var curIdx = TABS.indexOf(currentTab);
+  for (var i = 1; i <= TABS.length; i++) {
+    var nextIdx = (curIdx + i) % TABS.length;
+    if (!isBlockCompleted(TABS[nextIdx])) {
+      switchTab(TABS[nextIdx]);
+      document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+  }
+});
+updateSubmitBtn();
+</script>
+</body>
+</html>
