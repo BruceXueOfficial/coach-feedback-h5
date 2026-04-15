@@ -200,8 +200,11 @@ function updateTextarea(blockId) {
     else ta.placeholder = '请选择标签(多选)后再根据指引填写';
     return;
   }
-  if (tags.length === 0) { ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写'; ta.style.color = ''; return; }
+  if (tags.length === 0) { ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写'; ta.style.color = ''; ta.style.height = '120px'; return; }
   ta.value = buildGuide(blockId, tags); ta.style.color = 'var(--mcd-gray-400)'; ta.placeholder = '';
+  // Auto expand to fit guide text
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(120, ta.scrollHeight) + 'px';
 }
 
 function buildGuide(blockId, tags) {
