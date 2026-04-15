@@ -46,12 +46,7 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
 .nav-bar__btn:active { background: rgba(0,0,0,0.15); }
 .nav-bar__btn svg { width: 18px; height: 18px; }
 
-/* ===== Phase Tabs ===== */
-.phase-tabs { background: var(--mcd-yellow); padding: 0 16px 14px; display: flex; gap: 0; position: sticky; top: calc(88px + var(--safe-top)); z-index: 98; }
-.phase-tab { flex: 1; text-align: center; font-size: 13px; font-weight: 500; color: rgba(41,41,41,0.55); padding: 8px 0; background: none; border: none; cursor: pointer; position: relative; }
-.phase-tab.active { color: var(--mcd-dark); font-weight: 700; }
-.phase-tab.active::after { content: ''; position: absolute; bottom: 0; left: 25%; right: 25%; height: 3px; background: var(--mcd-dark); border-radius: 2px; }
-.phase-tab .check { font-size: 11px; margin-left: 2px; }
+/* ===== Phase Tabs (removed) ===== */
 
 .content { padding: 16px; padding-bottom: calc(100px + var(--safe-bottom)); }
 .card { background: var(--mcd-white); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); animation: fadeInUp 0.4s ease backwards; }
@@ -222,13 +217,7 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
   </div>
 </nav>
 
-<!-- Phase Tabs -->
-<div class="phase-tabs">
-  <button class="phase-tab">值班前24小时 <span class="check">✓</span></button>
-  <button class="phase-tab">值班前30分钟 <span class="check">✓</span></button>
-  <button class="phase-tab active">值班中 <span class="check">✓</span></button>
-  <button class="phase-tab">值班后 <span class="check">✓</span></button>
-</div>
+
 
 <main class="content">
 
@@ -236,8 +225,8 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
   <div class="overview-card" id="overviewCard">
     <div class="overview-header">
       <div class="overview-header__left">
-        <!-- StoreOverview icon -->
-        <svg class="overview-header__icon" viewBox="64 64 896 896" fill="#FFBC0D"><path d="M512 128c-212.08 0-384 171.92-384 384s171.92 384 384 384 384-171.92 384-384-171.92-384-384-384zm0 704c-176.73 0-320-143.27-320-320S335.27 192 512 192s320 143.27 320 320-143.27 320-320 320zm-32-512h64v192h-64zm0 256h64v64h-64z"/></svg>
+        <!-- McD StoreOverview icon -->
+        <svg class="overview-header__icon" viewBox="64 64 896 896" fill="currentColor"><path d="M886 205.76a66 66 0 0166 66v66a66 66 0 01-62.12 65.89l-3.88.11v462a66 66 0 01-66 66H204a66 66 0 01-66-66v-462a66 66 0 01-66-66v-66a66 66 0 0166-66h748z" fill="#FFBC0D"/><path d="M732 71.74c24.3 0 44 19.75 44 44.1v815.93H380V115.85c0-24.36 19.7-44.1 44-44.1h308z" fill="#DB0007"/><path d="M632.65 162.23c40.58 0 72.32 98.37 72.32 219.66l-2.2 2.2h-31.19l-2.2-2.2c0-109.62-17.4-199.73-36.73-199.73-19.38 0-36.77 83.08-36.77 184.2l-2.2 2.2h-31.19l-2.2-2.2c0-101.12-17.4-184.2-36.77-184.2-19.35 0-36.78 90.2-36.78 199.73l-2.2 2.2h-31.18l-2.2-2.2c0-120.9 31.99-219.66 72.36-219.66 20.96 0 40 24.34 53.34 65.46l1.21 3.93 1.27-3.96c12.86-39.4 30.75-63.29 50.6-65.29l2.71-.14z" fill="#FFBC0D"/></svg>
         <h2 class="overview-header__title">数据总览</h2>
       </div>
       <button class="overview-header__toggle" id="overviewToggle" aria-label="收起/展开">
@@ -248,26 +237,34 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
 
       <!-- AI 总结 -->
       <div class="ai-summary" id="aiSummary">
-        <div class="ai-summary__header">
-          <span class="ai-summary__icon">✨</span>
+        <div class="ai-summary__header" id="aiHeader" style="cursor:pointer;">
+          <svg class="ai-summary__icon" width="18" height="18" viewBox="64 64 896 896" fill="#FFBC0D"><path d="M720.67 106.05l27.71 16a37.33 37.33 0 0113.66 51l-41.78 72.38c68.1 2.92 122.4 59.06 122.4 127.88v352c0 70.69-57.3 128-128 128H309.33c-70.7 0-128-57.31-128-128v-352c0-70.47 56.94-127.63 127.32-128l-41.73-72.26a37.33 37.33 0 0113.67-51l27.71-16a5.33 5.33 0 017.28 1.95l73.27 126.9a37.32 37.32 0 014.09 10.4h242.22c.8-2.58 1.9-5.11 3.32-7.56L713.38 108a5.33 5.33 0 017.29-1.95zm-6 213.92H309.32c-28.28 0-51.41 22-53.22 49.83l-.11 3.5v352c0 28.28 22 51.42 49.82 53.23l3.51.1h405.33c28.28 0 51.42-22 53.22-49.82l.12-3.5v-352c0-28.28-22-51.42-49.83-53.22l-3.5-.12zm-112 337a5.33 5.33 0 015.33 5.34v32a37.33 37.33 0 01-37.34 37.33H421.33a5.33 5.33 0 01-5.33-5.33v-32a37.33 37.33 0 0137.33-37.34h149.33zM373.32 426.64a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67zm277.33 0a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67z"/></svg>
           <span class="ai-summary__label">AI 总结</span>
+          <svg id="aiChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mcd-gray-500)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;transition:transform 0.3s;"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="ai-summary__text" id="aiText">
           本班次<b>业务达成表现优异</b>，Sales 达 12940 元超出目标 13622 元的预期节奏，尖峰 GC 达 346 略低于目标 358，其中 11:00-12:00 时段表现突出（108 vs 目标 77）。<b>客户满意度 OSAT 100%</b>，无客诉记录，非常棒！员工认知方面，本班次认知了 <b>3/12</b> 位员工，建议关注更多员工的表现并给予认可。值班工具完成率 85%，基础任务完成率 92%，整体值班表现良好，继续保持！
         </div>
-        <button class="ai-summary__toggle" id="aiToggle">
-          <span id="aiToggleText">收起</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+
+      <!-- 数据展示 (独立收起) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:15px;font-weight:700;color:var(--mcd-dark);">数据展示</span>
+        <button id="dataToggle" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mcd-gray-500);">
+          <span id="dataToggleText">收起</span>
+          <svg id="dataChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.3s;"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
       </div>
+      <div id="dataBody" style="transition:max-height 0.35s ease,opacity 0.25s ease;overflow:hidden;">
 
       <!-- 维度1: 业务达成 -->
       <div class="dim-block">
         <div class="dim-block__header">
           <div class="dim-block__icon dim-block__icon--sales">
-            <svg viewBox="64 64 896 896" fill="#FF8C00"><path d="M848 512a5.33 5.33 0 015.33 5.33v341.34A37.33 37.33 0 01816 896h-32a5.33 5.33 0 01-5.34-5.33V549.27A37.33 37.33 0 01816 512h32zm-203 69a5.33 5.33 0 015.34 5.34v267.44A37.33 37.33 0 01613 891h-32a5.33 5.33 0 01-5.33-5.33V618.09A37.33 37.33 0 01613 581h32zm-235-117a37.33 37.33 0 0137.34 37.33v384a5.33 5.33 0 01-5.33 5.33h-32a37.33 37.33 0 01-37.33-37.33v-384a5.33 5.33 0 015.33-5.33h32zM240 683a5.33 5.33 0 015.34 5.33v163.1A37.33 37.33 0 01208 889h-32a5.33 5.33 0 01-5.33-5.33V720A37.33 37.33 0 01208 683h32z"/></svg>
+            <!-- McD SalesOutlined -->
+            <svg viewBox="64 64 896 896" width="18" height="18" fill="#FF8C00"><path d="M848.08 511.94a5.33 5.33 0 015.33 5.33v341.34a37.33 37.33 0 01-37.33 37.33h-32a5.33 5.33 0 01-5.34-5.33V549.27a37.33 37.33 0 0137.34-37.33h32zm-202.7 68.81a5.33 5.33 0 015.34 5.34v267.44a37.33 37.33 0 01-37.34 37.33h-32a5.33 5.33 0 01-5.33-5.33V618.09a37.33 37.33 0 0137.33-37.34h32zm-234.7-117.43a37.33 37.33 0 0137.34 37.33v384a5.33 5.33 0 01-5.33 5.33h-32a37.33 37.33 0 01-37.33-37.33v-384a5.33 5.33 0 015.33-5.33h32zM240 682.6a5.33 5.33 0 015.34 5.33v163.1a37.33 37.33 0 01-37.34 37.34h-32a5.33 5.33 0 01-5.33-5.33V719.94A37.33 37.33 0 01208 682.61h32zm623.7-533.27a32 32 0 0132 32v240a5.33 5.33 0 01-5.34 5.33h-32a37.33 37.33 0 01-37.33-37.33L821 259.08 599.96 481.21a37.34 37.34 0 01-50.09 2.58l-2.66-2.4L405.58 340.9 205.2 551.7a37.34 37.34 0 01-50.05 3.68l-2.73-2.35-23.19-22.05a5.33 5.33 0 01-.19-7.54l248.72-261.6a37.34 37.34 0 0150.8-3.1l2.55 2.32 142.23 141.07 177.25-178.14-94.9.02a37.33 37.33 0 01-37.33-37.33v-32a5.33 5.33 0 015.33-5.33h240z"/></svg>
           </div>
-          <span class="dim-block__title">🔥 业务达成</span>
+          <span class="dim-block__title">业务达成</span>
         </div>
 
         <!-- Sales -->
@@ -359,9 +356,10 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
       <div class="dim-block">
         <div class="dim-block__header">
           <div class="dim-block__icon dim-block__icon--csat">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#4285F4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zm1-2h2v-2H8v2zm6 0h2v-2h-2v2z"/></svg>
+            <!-- McD SatisfactionOutlined -->
+            <svg viewBox="64 64 896 896" width="18" height="18" fill="#4285F4"><path d="M540.83 100.06l126.91 109.81a42.67 42.67 0 0034.48 9.9l141.68-22.05a42.67 42.67 0 0149.04 46.1l-21.8 234.99C855.9 642.85 718.26 768.3 553.51 768.3l-4.9-.01v131.98a37.34 37.34 0 01-34.26 37.2l-3.06.13h-32a5.34 5.34 0 01-5.2-4.1l-.14-1.23-.02-163.98h-.38c-165.04 0-303.14-125.24-319.22-289.5l-23.02-235.12a42.67 42.67 0 0148.72-46.36l151.67 22.5a42.67 42.67 0 0035.19-10.85l117.08-108a42.67 42.67 0 0156.85-.9z"/></svg>
           </div>
-          <span class="dim-block__title">👍 客户满意</span>
+          <span class="dim-block__title">客户满意</span>
         </div>
         <div class="metric-row">
           <div class="metric-row__left">
@@ -378,7 +376,7 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
             <div class="metric-row__label">CCC 客诉</div>
           </div>
           <div class="metric-row__right">
-            <span class="ccc-empty">该班次无客诉 ✓</span>
+            <span class="ccc-empty">该班次无客诉 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><polyline points="4 12 9 17 20 6"/></svg></span>
           </div>
         </div>
       </div>
@@ -387,9 +385,10 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
       <div class="dim-block">
         <div class="dim-block__header">
           <div class="dim-block__icon dim-block__icon--staff">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#E91E63"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <!-- McD StaffOutlined -->
+            <svg viewBox="64 64 896 896" width="18" height="18" fill="#E91E63"><path d="M656 106.66a48 48 0 0148 48v208c0 66.33-33.63 124.8-84.78 159.3l125.74 36.65A209.78 209.78 0 01896 760v93.33a64 64 0 01-64 64H192a64 64 0 01-64-64V760A209.78 209.78 0 01279.04 558.6l125.74-36.65c-51.15-34.5-84.78-92.97-84.78-159.3v-64c0-106.04 85.96-192 192-192h144z"/></svg>
           </div>
-          <span class="dim-block__title">😊 员工满意</span>
+          <span class="dim-block__title">员工满意</span>
         </div>
         <div class="staff-metric">
           <div style="text-align:center;">
@@ -403,9 +402,10 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
       <div class="dim-block">
         <div class="dim-block__header">
           <div class="dim-block__icon dim-block__icon--perf">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="#34A853"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            <!-- McD DashboardOutlined -->
+            <svg viewBox="64 64 896 896" width="18" height="18" fill="#34A853"><path d="M512 72c243 0 440 197 440 440a437.98 437.98 0 01-79.14 251.82 320.37 320.37 0 01-19.32 27.58c-6.8 8.7-14.2 17.26-22.2 25.7a6.6 6.6 0 01-8.85.66l-25.65-20.04a38.5 38.5 0 01-6.64-54.04L814.94 712l.81-1.18a360.84 360.84 0 0056.48-153.78h-29.18a38.5 38.5 0 01-38.5-38.5v-31.9a6.6 6.6 0 016.6-6.6h62.46a361.31 361.31 0 00-80.08-197.22l-21.7 21.7a38.5 38.5 0 01-54.45 0l-22.55-22.56a6.6 6.6 0 010-9.34l44.03-44.02a361.27 361.27 0 00-190.46-77.8v28.72a38.5 38.5 0 01-38.5 38.5H478a6.6 6.6 0 01-6.6-6.6l-.01-60.18a361.27 361.27 0 00-185.6 76.83l22.02 22a38.5 38.5 0 010 54.44l-22.56 22.56a6.6 6.6 0 01-9.33 0L231 282.18a361.32 361.32 0 00-80.61 197.87h31.75a38.5 38.5 0 0138.5 38.5v31.9a6.6 6.6 0 01-6.6 6.6h-62.27a360.84 360.84 0 0057.3 155.02l24.8 31.6a38.5 38.5 0 01-6.63 54.05l-25.66 20.04a6.6 6.6 0 01-8.85-.66c-8-8.44-15.4-17-22.2-25.7a329.49 329.49 0 01-18.8-26.7A438.16 438.16 0 0172 512C72 269 269 72 512 72z"/></svg>
           </div>
-          <span class="dim-block__title">📋 值班表现</span>
+          <span class="dim-block__title">值班表现</span>
         </div>
         <div class="completion-row">
           <div class="completion-item">
@@ -420,6 +420,7 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
           </div>
         </div>
       </div>
+      </div><!-- end dataBody -->
 
     </div>
   </div>
@@ -530,15 +531,27 @@ overviewToggle.addEventListener('click', function() {
 });
 
 // ===== AI Summary toggle =====
-var aiToggle = document.getElementById('aiToggle');
+var aiHeader = document.getElementById('aiHeader');
 var aiText = document.getElementById('aiText');
-var aiToggleText = document.getElementById('aiToggleText');
+var aiChevron = document.getElementById('aiChevron');
 var aiExpanded = true;
-aiToggle.addEventListener('click', function() {
+aiHeader.addEventListener('click', function() {
   aiExpanded = !aiExpanded;
   aiText.style.display = aiExpanded ? 'block' : 'none';
-  aiToggleText.textContent = aiExpanded ? '收起' : '展开';
-  this.querySelector('svg').style.transform = aiExpanded ? '' : 'rotate(180deg)';
+  aiChevron.style.transform = aiExpanded ? '' : 'rotate(180deg)';
+});
+
+// ===== Data展示 toggle =====
+var dataToggle = document.getElementById('dataToggle');
+var dataBody = document.getElementById('dataBody');
+var dataChevron = document.getElementById('dataChevron');
+var dataToggleText = document.getElementById('dataToggleText');
+var dataExpanded = true;
+dataToggle.addEventListener('click', function() {
+  dataExpanded = !dataExpanded;
+  dataBody.style.display = dataExpanded ? 'block' : 'none';
+  dataToggleText.textContent = dataExpanded ? '收起' : '展开';
+  dataChevron.style.transform = dataExpanded ? '' : 'rotate(180deg)';
 });
 
 // ===== Feedback logic (same as option-3) =====
