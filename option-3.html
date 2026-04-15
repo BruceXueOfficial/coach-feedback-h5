@@ -166,10 +166,10 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
     .fp__title { font-size: 16px; font-weight: 700; }
     .fp__sub { font-size: 13px; color: var(--mcd-gray-500); margin-bottom: 14px; padding-left: 11px; }
     .tags-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-    .tag { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--mcd-gray-200); background: var(--mcd-white); font-size: 14px; color: var(--mcd-gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.2s ease; user-select: none; -webkit-user-select: none; }
+    .tag { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 20px; border: 1.5px solid var(--mcd-gray-200); background: var(--mcd-white); font-size: 12px; color: var(--mcd-gray-700); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.2s ease; user-select: none; -webkit-user-select: none; flex-shrink: 0; }
     .tag:active { transform: scale(0.96); }
-    .tag__check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--mcd-gray-400); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
-    .tag__check svg { width: 10px; height: 10px; opacity: 0; transition: opacity 0.15s; }
+    .tag__check { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--mcd-gray-400); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
+    .tag__check svg { width: 8px; height: 8px; opacity: 0; transition: opacity 0.15s; }
     .tag.active { border-color: var(--mcd-yellow); background: var(--mcd-yellow-pale); color: var(--mcd-dark); font-weight: 500; }
     .tag.active .tag__check { background: var(--mcd-yellow); border-color: var(--mcd-yellow); }
     .tag.active .tag__check svg { opacity: 1; }
@@ -232,97 +232,123 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
   </section>
 </main>
 
-<div class="submit-bar"><button class="submit-btn" id="submitBtn">给予反馈</button></div>
+<div class="submit-bar"><button class="submit-btn" id="submitBtn">下一个</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const GUIDE_MAP = {
+var GUIDE_MAP = {
   '顾客体验': ['顾客满意度', '服务效率', '问题解决', '顾客互动'],
   '员工体验': ['工作积极性', '团队协作', '员工关怀', '训练成长'],
   '业务达成': ['营业额达成', '食品安全', '运营效率', '成本管控']
 };
-const BLOCK_SUFFIX = { dowell: '等方面夸夸！', dobetter: '等方面聊聊！', donext: '等方面制定计划！' };
-const state = { dowell: new Set(), dobetter: new Set(), donext: new Set() };
-const userContent = { dowell: '', dobetter: '', donext: '' };
+var BLOCK_SUFFIX = { dowell: '等方面夸夸！', dobetter: '等方面聊聊！', donext: '等方面制定计划！' };
+var TABS = ['dowell', 'dobetter', 'donext'];
+var state = { dowell: new Set(), dobetter: new Set(), donext: new Set() };
+var userContent = { dowell: '', dobetter: '', donext: '' };
+var currentTab = 'dowell';
 
-// Tab switching
-document.querySelectorAll('.tab-item').forEach(tab => {
-  tab.addEventListener('click', function() {
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    this.classList.add('active');
-    document.querySelectorAll('.feedback-panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + this.dataset.tab).classList.add('active');
-  });
+// ===== Tab switching =====
+function switchTab(tabId) {
+  currentTab = tabId;
+  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelector('.tab-item[data-tab="' + tabId + '"]').classList.add('active');
+  document.querySelectorAll('.feedback-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + tabId).classList.add('active');
+  updateSubmitBtn();
+}
+
+document.querySelectorAll('.tab-item').forEach(function(tab) {
+  tab.addEventListener('click', function() { switchTab(this.dataset.tab); });
 });
 
-// Tag click
-document.querySelectorAll('.tag').forEach(tag => {
+// ===== Tag click =====
+document.querySelectorAll('.tag').forEach(function(tag) {
   tag.addEventListener('click', function() {
-    const blockId = this.dataset.blockId;
-    const tagName = this.dataset.tag;
+    var blockId = this.dataset.blockId, tagName = this.dataset.tag;
     if (state[blockId].has(tagName)) { state[blockId].delete(tagName); this.classList.remove('active'); }
     else { state[blockId].add(tagName); this.classList.add('active'); }
     updateTextarea(blockId);
+    updateSubmitBtn();
   });
 });
 
 function updateTextarea(blockId) {
-  const ta = document.querySelector('textarea[data-block-id="' + blockId + '"]');
-  const guideEl = document.querySelector('.guide-text[data-guide="' + blockId + '"]');
-  const tags = Array.from(state[blockId]);
-
+  var ta = document.querySelector('textarea[data-block-id="' + blockId + '"]');
+  var guideEl = document.querySelector('.guide-text[data-guide="' + blockId + '"]');
+  var tags = Array.from(state[blockId]);
   if (tags.length === 0) {
     guideEl.textContent = ''; guideEl.classList.remove('visible');
-    if (userContent[blockId].trim().length === 0) {
-      ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写';
-    }
+    if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写'; }
     ta.disabled = true; return;
   }
-
-  // Show guide text above textarea
   guideEl.textContent = buildGuide(blockId, tags);
   guideEl.classList.add('visible');
   ta.disabled = false;
-  if (userContent[blockId].trim().length === 0) {
-    ta.value = ''; ta.placeholder = '请在此输入反馈内容...';
-    ta.style.color = '';
-  }
+  if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请在此输入反馈内容...'; ta.style.color = ''; }
 }
 
 function buildGuide(blockId, tags) {
   var suffix = BLOCK_SUFFIX[blockId];
-  var lines = tags.map(function(t) {
-    var dims = GUIDE_MAP[t] || [];
-    return '• ' + t + '：从' + dims.join('、') + suffix;
-  });
-  return lines.join('\n');
+  return tags.map(function(t) { return '• ' + t + '：从' + (GUIDE_MAP[t] || []).join('、') + suffix; }).join('\n');
 }
 
-// Track input & completed state
+// ===== Track input & completed state =====
 document.querySelectorAll('textarea').forEach(function(ta) {
   var blockId = ta.dataset.blockId;
-  ta.addEventListener('focus', function() {});
-  ta.addEventListener('blur', function() {
-    userContent[blockId] = this.value;
-    updateCompleted(blockId);
-  });
+  ta.addEventListener('blur', function() { userContent[blockId] = this.value; updateCompleted(blockId); updateSubmitBtn(); });
   ta.addEventListener('input', function() {
     userContent[blockId] = this.value; this.style.color = '';
     this.style.height = 'auto'; this.style.height = Math.max(180, this.scrollHeight) + 'px';
-    updateCompleted(blockId);
+    updateCompleted(blockId); updateSubmitBtn();
   });
 });
 
+function isBlockCompleted(blockId) {
+  return userContent[blockId].trim().length > 0 && state[blockId].size > 0;
+}
+
 function updateCompleted(blockId) {
   var tab = document.querySelector('.tab-item[data-tab="' + blockId + '"]');
-  if (userContent[blockId].trim().length > 0 && state[blockId].size > 0) tab.classList.add('completed');
+  if (isBlockCompleted(blockId)) tab.classList.add('completed');
   else tab.classList.remove('completed');
 }
 
-document.getElementById('submitBtn').addEventListener('click', function() {
-  var t = document.getElementById('toast'); t.textContent = '反馈提交成功 ✓';
-  t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 2000);
+// ===== Smart Submit Button =====
+var submitBtn = document.getElementById('submitBtn');
+
+function updateSubmitBtn() {
+  var allDone = TABS.every(isBlockCompleted);
+  if (allDone) {
+    submitBtn.textContent = '去提交';
+    submitBtn.style.background = 'var(--mcd-yellow)';
+  } else {
+    submitBtn.textContent = '下一个';
+    submitBtn.style.background = 'var(--mcd-yellow)';
+  }
+}
+
+submitBtn.addEventListener('click', function() {
+  var allDone = TABS.every(isBlockCompleted);
+  if (allDone) {
+    var t = document.getElementById('toast'); t.textContent = '反馈提交成功 ✓';
+    t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 2000);
+    return;
+  }
+  // Find next incomplete tab (circular from current)
+  var curIdx = TABS.indexOf(currentTab);
+  for (var i = 1; i <= TABS.length; i++) {
+    var nextIdx = (curIdx + i) % TABS.length;
+    if (!isBlockCompleted(TABS[nextIdx])) {
+      switchTab(TABS[nextIdx]);
+      // Scroll to top of feedback card
+      document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+  }
 });
+
+// Init button state
+updateSubmitBtn();
 </script>
 </body>
 </html>
