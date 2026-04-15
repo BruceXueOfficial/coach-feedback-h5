@@ -201,7 +201,7 @@ body {
   transition: border-color 0.2s; line-height: 1.6;
   -webkit-appearance: none;
 }
-.textarea-wrap textarea::placeholder { color: var(--mcd-gray-400); font-size: 13px; }
+.textarea-wrap textarea::placeholder { color: var(--mcd-gray-400); font-size: 14px; }
 .textarea-wrap textarea:focus {
   border-color: var(--mcd-yellow);
   box-shadow: 0 0 0 3px rgba(255,188,13,0.15);
@@ -348,11 +348,15 @@ body {
   width: 100%; max-width: 360px;
   overflow: hidden; border-radius: var(--radius-lg);
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .modal-img-wrap img {
   width: 100%; display: block;
   transition: transform 0.2s ease;
   transform-origin: center center;
+  will-change: transform;
+  pointer-events: none;
 }
 
 /* ===== Toast ===== */
@@ -617,14 +621,20 @@ document.getElementById('sbiaModal').addEventListener('click', function(e) {
 
 // ===== Pinch to Zoom =====
 let imgScale = 1;
+let baseScale = 1;
 let initialDistance = 0;
 const imgWrap = document.getElementById('imgWrap');
 const sbiaImg = document.getElementById('sbiaImg');
 
 if (imgWrap) {
+  // Prevent default touch behaviors on the image wrapper
+  imgWrap.style.touchAction = 'none';
+
   imgWrap.addEventListener('touchstart', function(e) {
     if (e.touches.length === 2) {
       e.preventDefault();
+      e.stopPropagation();
+      baseScale = imgScale;
       initialDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
@@ -633,32 +643,39 @@ if (imgWrap) {
   }, { passive: false });
 
   imgWrap.addEventListener('touchmove', function(e) {
-    if (e.touches.length === 2) {
+    if (e.touches.length === 2 && initialDistance > 0) {
       e.preventDefault();
+      e.stopPropagation();
       const currentDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
       const ratio = currentDistance / initialDistance;
-      imgScale = Math.min(Math.max(ratio, 1), 3);
+      imgScale = Math.min(Math.max(baseScale * ratio, 1), 4);
       sbiaImg.style.transform = 'scale(' + imgScale + ')';
+      sbiaImg.style.transition = 'none';
     }
   }, { passive: false });
 
-  imgWrap.addEventListener('touchend', function() {
-    if (imgScale < 1.2) {
-      imgScale = 1;
-      sbiaImg.style.transform = 'scale(1)';
+  imgWrap.addEventListener('touchend', function(e) {
+    sbiaImg.style.transition = 'transform 0.2s ease';
+    if (e.touches.length === 0) {
+      initialDistance = 0;
+      if (imgScale < 1.15) {
+        imgScale = 1;
+        sbiaImg.style.transform = 'scale(1)';
+      }
     }
   });
 
   // Double tap to toggle zoom
   let lastTap = 0;
-  imgWrap.addEventListener('touchend', function(e) {
-    if (e.touches.length > 0) return;
+  imgWrap.addEventListener('click', function(e) {
     const now = Date.now();
     if (now - lastTap < 300) {
-      imgScale = imgScale > 1 ? 1 : 2.5;
+      e.preventDefault();
+      imgScale = imgScale > 1.5 ? 1 : 2.5;
+      sbiaImg.style.transition = 'transform 0.3s ease';
       sbiaImg.style.transform = 'scale(' + imgScale + ')';
     }
     lastTap = now;
