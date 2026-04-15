@@ -3,684 +3,314 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>值班教练反馈</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --mcd-yellow: #FFBC0D;
-  --mcd-yellow-light: #FFF8E1;
-  --mcd-yellow-pale: #FFFBEF;
-  --mcd-red: #DA291C;
-  --mcd-dark: #292929;
-  --mcd-gray-700: #555;
-  --mcd-gray-500: #888;
-  --mcd-gray-400: #AAA;
-  --mcd-gray-200: #E5E5E5;
-  --mcd-gray-100: #F5F5F5;
-  --mcd-bg: #F2F2F2;
-  --mcd-white: #FFF;
-  --mcd-green: #34A853;
-  --mcd-green-light: #E8F5E9;
-  --mcd-orange: #FF8C00;
-  --mcd-blue: #4285F4;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --shadow-card: 0 1px 4px rgba(0,0,0,0.06);
-  --font: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
-body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dark); line-height: 1.6; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-
-/* ===== Status & Nav ===== */
-.status-bar { height: calc(44px + var(--safe-top)); padding-top: var(--safe-top); background: var(--mcd-yellow); position: sticky; top: 0; z-index: 100; }
-.nav-bar { background: var(--mcd-yellow); padding: 0 16px 12px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: calc(44px + var(--safe-top)); z-index: 99; }
-.nav-bar__back { display: flex; align-items: center; gap: 4px; background: none; border: none; font-size: 17px; font-weight: 600; color: var(--mcd-dark); cursor: pointer; padding: 8px 4px; }
-.nav-bar__back svg { width: 20px; height: 20px; }
-.nav-bar__actions { display: flex; gap: 12px; }
-.nav-bar__btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.08); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.nav-bar__btn:active { background: rgba(0,0,0,0.15); }
-.nav-bar__btn svg { width: 18px; height: 18px; }
-
-/* ===== Phase Tabs (removed) ===== */
-
-.content { padding: 16px; padding-bottom: calc(100px + var(--safe-bottom)); }
-.card { background: var(--mcd-white); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-card); animation: fadeInUp 0.4s ease backwards; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ===== 值班总览 Section ===== */
-.overview-card { background: var(--mcd-white); border-radius: var(--radius-lg); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: hidden; animation: fadeInUp 0.4s ease backwards; }
-.overview-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px; }
-.overview-header__left { display: flex; align-items: center; gap: 8px; }
-.overview-header__icon { width: 28px; height: 28px; }
-.overview-header__title { font-size: 18px; font-weight: 700; }
-.overview-header__toggle { background: none; border: none; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center; transition: transform 0.3s; }
-.overview-header__toggle.collapsed { transform: rotate(180deg); }
-.overview-header__toggle svg { width: 20px; height: 20px; color: var(--mcd-gray-500); }
-.overview-body { padding: 0 20px 20px; transition: max-height 0.35s ease, opacity 0.25s ease; overflow: hidden; }
-.overview-body.collapsed { max-height: 0 !important; padding: 0 20px; opacity: 0; }
-
-/* AI Summary */
-.ai-summary { background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,188,13,0.15); }
-.ai-summary__header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-.ai-summary__icon { font-size: 18px; }
-.ai-summary__label { font-size: 15px; font-weight: 700; color: var(--mcd-dark); }
-.ai-summary__text { font-size: 13px; color: var(--mcd-gray-700); line-height: 1.8; }
-.ai-summary__toggle { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 10px; padding: 6px; background: none; border: none; cursor: pointer; font-size: 12px; color: var(--mcd-gray-500); width: 100%; }
-
-/* Dimension Blocks */
-.dim-block { background: var(--mcd-white); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; border: 1.5px solid var(--mcd-gray-200); }
-.dim-block:last-child { margin-bottom: 0; }
-.dim-block__header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-.dim-block__icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.dim-block__icon--sales { background: var(--mcd-yellow-light); }
-.dim-block__icon--csat { background: var(--mcd-yellow-light); }
-.dim-block__icon--staff { background: var(--mcd-yellow-light); }
-.dim-block__icon--perf { background: var(--mcd-yellow-light); }
-.dim-block__icon svg { width: 18px; height: 18px; }
-.dim-block__title { font-size: 15px; font-weight: 700; }
-
-/* Metric Row */
-.metric-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--mcd-gray-200); }
-.metric-row:last-child { border-bottom: none; }
-.metric-row__left { flex: 1; }
-.metric-row__label { font-size: 13px; color: var(--mcd-gray-500); margin-bottom: 2px; }
-.metric-row__sub { font-size: 11px; color: var(--mcd-gray-400); }
-.metric-row__right { display: flex; align-items: baseline; gap: 8px; text-align: right; }
-.metric-row__value { font-size: 20px; font-weight: 700; color: var(--mcd-dark); }
-.metric-row__target { font-size: 12px; color: var(--mcd-gray-500); }
-.metric-row__diff { font-size: 12px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
-.metric-row__diff--up { color: var(--mcd-green); background: var(--mcd-green-light); }
-.metric-row__diff--down { color: var(--mcd-red); background: #FFEBEE; }
-.metric-row__diff--neutral { color: var(--mcd-gray-500); background: var(--mcd-gray-100); }
-
-/* Peak Time Slots */
-.peak-slots { margin-top: 8px; }
-.peak-slot { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; background: var(--mcd-white); }
-.peak-slot__time { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-.peak-slot__dot { width: 8px; height: 8px; border-radius: 50%; }
-.peak-slot__dot--green { background: var(--mcd-green); }
-.peak-slot__dot--yellow { background: var(--mcd-yellow); }
-.peak-slot__dot--orange { background: var(--mcd-orange); }
-.peak-slot__dot--red { background: var(--mcd-red); }
-.peak-slot__right { display: flex; align-items: center; gap: 10px; }
-.peak-slot__val { font-size: 15px; font-weight: 700; }
-.peak-slot__info { font-size: 11px; color: var(--mcd-gray-500); }
-.peak-slot__diff { font-size: 12px; font-weight: 600; }
-.peak-slot__diff--up { color: var(--mcd-green); }
-.peak-slot__diff--down { color: var(--mcd-red); }
-
-/* Staff metric special */
-.staff-metric { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
-.staff-metric__big { font-size: 28px; font-weight: 900; color: var(--mcd-dark); }
-.staff-metric__sep { font-size: 20px; color: var(--mcd-gray-400); }
-.staff-metric__small { font-size: 16px; color: var(--mcd-gray-500); }
-.staff-metric__label { font-size: 12px; color: var(--mcd-gray-500); }
-
-/* Completion bars */
-.completion-row { display: flex; gap: 12px; }
-.completion-item { flex: 1; }
-.completion-item__label { font-size: 12px; color: var(--mcd-gray-500); margin-bottom: 6px; }
-.completion-item__bar { height: 8px; background: var(--mcd-gray-200); border-radius: 4px; overflow: hidden; margin-bottom: 4px; }
-.completion-item__fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-.completion-item__fill--green { background: var(--mcd-yellow); }
-.completion-item__fill--yellow { background: var(--mcd-red); }
-.completion-item__val { font-size: 14px; font-weight: 700; }
-
-/* CCC */
-.ccc-empty { font-size: 13px; color: var(--mcd-gray-400); padding: 4px 0; }
-
-/* ===== Person Card ===== */
-.person-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.person-header__title { font-size: 18px; font-weight: 700; }
-.person-header__link { display: flex; align-items: center; gap: 2px; background: var(--mcd-dark); color: var(--mcd-white); font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 20px; border: none; cursor: pointer; }
-.person-header__link:active { opacity: 0.8; }
-.person-header__link svg { width: 14px; height: 14px; }
-.person-info { display: flex; align-items: center; gap: 14px; }
-.person-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--mcd-yellow-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.person-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
-.person-meta { font-size: 13px; color: var(--mcd-gray-500); display: flex; gap: 16px; }
-.section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
-
-/* ===== SBIA Card ===== */
-.sbia-card { background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%); border-radius: 12px; padding: 16px; margin-bottom: 20px; border: 1px solid rgba(255,188,13,0.2); }
-.sbia-card__title { font-size: 16px; font-weight: 700; color: #292929; margin-bottom: 10px; }
-.sbia-card__badge { background: #FFBC0D; color: #292929; text-align: center; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
-.sbia-card__flow { display: flex; align-items: flex-start; justify-content: center; gap: 4px; }
-.sbia-card__step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.sbia-card__icon { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
-.sbia-card__icon--s { background: #9E9E9E; }
-.sbia-card__icon--b { background: #616161; }
-.sbia-card__icon--i { background: #DA291C; }
-.sbia-card__icon--a { background: #EE3A2C; }
-.sbia-card__label { font-size: 13px; font-weight: 700; color: #292929; }
-.sbia-card__sub { font-size: 10px; color: #888; }
-.sbia-card__arrow { color: #CCC; font-size: 16px; padding-top: 12px; flex-shrink: 0; }
-
-/* ===== Tabs & Feedback ===== */
-.tab-bar { display: flex; gap: 0; background: var(--mcd-gray-100); border-radius: 10px; padding: 3px; margin-bottom: 20px; }
-.tab-item { flex: 1; padding: 10px 8px; text-align: center; font-size: 13px; font-weight: 600; color: var(--mcd-gray-500); background: none; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; gap: 5px; }
-.tab-item.active { color: var(--mcd-dark); background: var(--mcd-white); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.tab-item__dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.tab-item__dot--green { background: var(--mcd-green); }
-.tab-item__dot--orange { background: var(--mcd-orange); }
-.tab-item__dot--blue { background: var(--mcd-blue); }
-.tab-item__check { width: 16px; height: 16px; border-radius: 50%; background: var(--mcd-green); display: none; align-items: center; justify-content: center; flex-shrink: 0; }
-.tab-item__check svg { width: 10px; height: 10px; }
-.tab-item.completed .tab-item__check { display: flex; }
-.feedback-panel { display: none; }
-.feedback-panel.active { display: block; animation: panelIn 0.25s ease; }
-@keyframes panelIn { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
-.fp__header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-.fp__ind { width: 3px; height: 18px; border-radius: 2px; flex-shrink: 0; align-self: center; }
-.fp__ind--g { background: var(--mcd-green); }
-.fp__ind--o { background: var(--mcd-orange); }
-.fp__ind--b { background: var(--mcd-blue); }
-.fp__title { font-size: 16px; font-weight: 700; }
-.fp__sub { font-size: 13px; color: var(--mcd-gray-500); margin-bottom: 14px; padding-left: 11px; }
-.tags-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-.tag { display: flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 20px; border: 1.5px solid var(--mcd-gray-200); background: var(--mcd-white); font-size: 12px; color: var(--mcd-gray-700); cursor: pointer; transition: all 0.2s ease; user-select: none; flex-shrink: 0; }
-.tag:active { transform: scale(0.96); }
-.tag__check { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--mcd-gray-400); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
-.tag__check svg { width: 8px; height: 8px; opacity: 0; transition: opacity 0.15s; }
-.tag.active { border-color: var(--mcd-yellow); background: var(--mcd-yellow-pale); color: var(--mcd-dark); font-weight: 500; }
-.tag.active .tag__check { background: var(--mcd-yellow); border-color: var(--mcd-yellow); }
-.tag.active .tag__check svg { opacity: 1; }
-.textarea-wrap textarea { width: 100%; min-height: 180px; padding: 14px; border: 1.5px solid var(--mcd-gray-200); border-radius: var(--radius-md); font-family: var(--font); font-size: 14px; color: var(--mcd-dark); background: var(--mcd-white); resize: none; outline: none; transition: border-color 0.2s; line-height: 1.6; -webkit-appearance: none; }
-.textarea-wrap textarea::placeholder { color: var(--mcd-gray-400); font-size: 13px; }
-.textarea-wrap textarea:focus { border-color: var(--mcd-yellow); box-shadow: 0 0 0 3px rgba(255,188,13,0.15); }
-.textarea-wrap textarea:disabled { background: var(--mcd-gray-100); color: var(--mcd-gray-400); cursor: not-allowed; }
-.guide-text { font-size: 13px; color: var(--mcd-gray-500); line-height: 1.6; margin-bottom: 8px; white-space: pre-line; display: none; }
-.guide-text.visible { display: block; }
-.submit-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px; padding-bottom: calc(12px + var(--safe-bottom)); background: var(--mcd-white); box-shadow: 0 -2px 10px rgba(0,0,0,0.06); z-index: 50; }
-.submit-btn { width: 100%; padding: 14px; border: none; border-radius: 28px; background: var(--mcd-yellow); color: var(--mcd-dark); font-family: var(--font); font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-.submit-btn:active { transform: scale(0.98); background: #E8AB00; }
-.toast { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.85); background: rgba(0,0,0,0.75); color: white; padding: 14px 28px; border-radius: var(--radius-md); font-size: 14px; font-weight: 500; z-index: 400; opacity: 0; pointer-events: none; transition: all 0.3s ease; }
-.toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-.divider { height: 1px; background: var(--mcd-gray-200); margin: 0 0 20px 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--y:#FFBC0D;--yl:#FFF8E1;--yp:#FFFBEF;--r:#DA291C;--dk:#292929;--g7:#555;--g5:#888;--g4:#AAA;--g2:#E5E5E5;--g1:#F5F5F5;--bg:#F2F2F2;--w:#FFF;--gn:#34A853;--gl:#E8F5E9;--or:#FF8C00;--bl:#4285F4;--rm:12px;--rl:16px;--sh:0 1px 4px rgba(0,0,0,.06);--f:'PingFang SC',-apple-system,BlinkMacSystemFont,'Helvetica Neue','Microsoft YaHei',sans-serif;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:var(--f);background:var(--bg);color:var(--dk);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+.status-bar{height:calc(44px + var(--st));padding-top:var(--st);background:var(--y);position:sticky;top:0;z-index:100}
+.nav{background:var(--y);padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:calc(44px + var(--st));z-index:99}
+.nav-back{display:flex;align-items:center;gap:4px;background:none;border:none;font-size:17px;font-weight:600;color:var(--dk);cursor:pointer;padding:8px 4px}
+.nav-back svg{width:20px;height:20px}
+.nav-acts{display:flex;gap:12px}
+.nav-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.08);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.nav-btn svg{width:18px;height:18px}
+.ct{padding:12px 16px;padding-bottom:calc(100px + var(--sb))}
+.card{background:var(--w);border-radius:var(--rl);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
+/* icon block */
+.ib{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--yl)}
+.ib svg{width:18px;height:18px}
+/* overview */
+.ov-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px}
+.ov-left{display:flex;align-items:center;gap:8px}
+.ov-title{font-size:17px;font-weight:700}
+.ov-tog{background:none;border:none;cursor:pointer;padding:6px;display:flex;transition:transform .3s}
+.ov-tog.flip{transform:rotate(180deg)}
+.ov-tog svg{width:18px;height:18px;color:var(--g5)}
+.ov-body{padding:0 16px 16px}
+.ov-body.hide{display:none}
+/* ai */
+.ai{background:linear-gradient(135deg,#FFF9E6,#FFF3CC);border-radius:var(--rm);padding:12px;margin-bottom:12px;border:1px solid rgba(255,188,13,.15)}
+.ai-hdr{display:flex;align-items:center;gap:8px;cursor:pointer}
+.ai-lbl{font-size:15px;font-weight:700;flex:1}
+.ai-tg{font-size:12px;color:var(--g5)}
+.ai-chv{width:14px;height:14px;transition:transform .3s}
+.ai-txt{font-size:13px;color:var(--g7);line-height:1.7;margin-top:10px}
+.ai-txt ul{list-style:disc;padding-left:18px;margin:0}
+.ai-txt li{margin-bottom:4px}
+/* data */
+.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.dh span{font-size:14px;font-weight:700}
+.dt{background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;gap:3px;font-size:12px;color:var(--g5);font-family:var(--f)}
+/* dim */
+.dim{background:var(--w);border-radius:var(--rm);padding:12px;margin-bottom:10px;border:1.5px solid var(--g2)}
+.dim:last-child{margin-bottom:0}
+.dim-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dim-t{font-size:15px;font-weight:700}
+/* metric */
+.mr{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--g2)}
+.mr:last-child{border-bottom:none}
+.ml{font-size:13px;color:var(--g5)}
+.ml-b{font-size:14px;font-weight:700;color:var(--dk)}
+.ms{font-size:11px;color:var(--g4)}
+.mv{font-size:18px;font-weight:700}
+.mv-s{font-size:15px;font-weight:700}
+.md{font-size:11px;font-weight:600;padding:1px 5px;border-radius:4px}
+.md-u{color:var(--gn);background:var(--gl)}
+.md-d{color:var(--r);background:#FFEBEE}
+.md-n{color:var(--g5);background:var(--g1)}
+/* grid2 */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g2i{background:var(--g1);border-radius:8px;padding:8px 10px}
+.g2t{font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.g2d{width:7px;height:7px;border-radius:50%}
+.g2v{font-size:15px;font-weight:700}
+.g2n{font-size:10px;color:var(--g5)}
+.g2f{font-size:11px;font-weight:600}
+/* staff */
+.sr{display:flex;gap:10px}
+.sc{flex:1;text-align:center;background:var(--g1);border-radius:8px;padding:10px 8px}
+.sp{font-size:22px;font-weight:900;color:var(--dk)}
+.sw{font-size:12px;color:var(--g5);margin-top:2px}
+.sl{font-size:11px;color:var(--g4);margin-top:2px}
+/* comp */
+.cr{display:flex;gap:10px}
+.ci{flex:1}
+.cl{font-size:11px;color:var(--g5);margin-bottom:4px}
+.cb{height:7px;background:var(--g2);border-radius:4px;overflow:hidden;margin-bottom:3px}
+.cf{height:100%;border-radius:4px}
+.cv{font-size:13px;font-weight:700}
+/* ccc */
+.cc{background:var(--g1);border-radius:8px;padding:10px;margin-top:6px;margin-bottom:6px}
+.cc-t{display:flex;justify-content:space-between;margin-bottom:3px}
+.cc-id{font-size:11px;font-weight:600}
+.cc-tm{font-size:10px;color:var(--g5)}
+.cc-d{font-size:12px;color:var(--g7);line-height:1.5}
+/* person */
+.pi{display:flex;align-items:center;gap:12px}
+.pa{width:48px;height:48px;border-radius:50%;background:var(--yl);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pn{font-size:16px;font-weight:600;margin-bottom:2px}
+.pm{font-size:12px;color:var(--g5);display:flex;gap:12px}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ph-t{font-size:17px;font-weight:700}
+.pl{display:flex;align-items:center;gap:2px;background:var(--dk);color:var(--w);font-size:11px;font-weight:500;padding:5px 10px;border-radius:16px;border:none;cursor:pointer}
+.pl svg{width:12px;height:12px}
+/* sec hdr */
+.sh{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.st{font-size:17px;font-weight:700;flex:1}
+/* tips */
+.tips-btn{display:flex;align-items:center;gap:4px;background:none;border:1.5px solid var(--g2);border-radius:16px;padding:4px 10px;font-size:11px;color:var(--g7);cursor:pointer;font-family:var(--f)}
+.tips-btn svg{width:12px;height:12px}
+.tips-p{display:none;margin-bottom:14px}
+.tips-p.show{display:block}
+.sbia{display:flex;align-items:flex-start;justify-content:center;gap:3px;background:linear-gradient(135deg,#FFF9E6,#FFF3CC);border-radius:10px;padding:14px 10px;border:1px solid rgba(255,188,13,.2)}
+.sbia-s{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center}
+.sbia-i{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:4px}
+.sbia-i--s{background:#9E9E9E}.sbia-i--b{background:#616161}.sbia-i--i{background:#DA291C}.sbia-i--a{background:#EE3A2C}
+.sbia-l{font-size:12px;font-weight:700}.sbia-u{font-size:9px;color:#888}
+.sbia-a{color:#CCC;font-size:14px;padding-top:10px;flex-shrink:0}
+/* tabs */
+.tb{display:flex;background:var(--g1);border-radius:10px;padding:3px;margin-bottom:14px}
+.ti{flex:1;padding:8px 6px;text-align:center;font-size:13px;font-weight:600;color:var(--g5);background:none;border:none;border-radius:8px;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:4px}
+.ti.active{color:var(--dk);background:var(--w);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.td{width:6px;height:6px;border-radius:50%}
+.td-g{background:var(--gn)}.td-o{background:var(--or)}.td-b{background:var(--bl)}
+.tc{width:14px;height:14px;border-radius:50%;background:var(--gn);display:none;align-items:center;justify-content:center}
+.tc svg{width:9px;height:9px}
+.ti.completed .tc{display:flex}
+.fp{display:none}.fp.active{display:block}
+.fp-h{display:flex;align-items:baseline;gap:6px;margin-bottom:3px}
+.fp-i{width:3px;height:16px;border-radius:2px;align-self:center}
+.fp-ig{background:var(--gn)}.fp-io{background:var(--or)}.fp-ib{background:var(--bl)}
+.fp-t{font-size:15px;font-weight:700}
+.fp-s{font-size:12px;color:var(--g5);margin-bottom:10px;padding-left:9px}
+.tgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.tg{display:flex;align-items:center;gap:3px;padding:5px 9px;border-radius:16px;border:1.5px solid var(--g2);background:var(--w);font-size:12px;color:var(--g7);cursor:pointer;user-select:none}
+.tg:active{transform:scale(.96)}
+.tg-c{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--g4);display:flex;align-items:center;justify-content:center}
+.tg-c svg{width:7px;height:7px;opacity:0}
+.tg.active{border-color:var(--y);background:var(--yp);color:var(--dk);font-weight:500}
+.tg.active .tg-c{background:var(--y);border-color:var(--y)}
+.tg.active .tg-c svg{opacity:1}
+.gd{font-size:12px;color:var(--g5);line-height:1.5;margin-bottom:6px;white-space:pre-line;display:none}
+.gd.visible{display:block}
+textarea{width:100%;min-height:160px;padding:12px;border:1.5px solid var(--g2);border-radius:var(--rm);font-family:var(--f);font-size:13px;color:var(--dk);background:var(--w);resize:none;outline:none;line-height:1.5;-webkit-appearance:none}
+textarea::placeholder{color:var(--g4);font-size:12px}
+textarea:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(255,188,13,.15)}
+textarea:disabled{background:var(--g1);color:var(--g4);cursor:not-allowed}
+.sub-bar{position:fixed;bottom:0;left:0;right:0;padding:10px 16px;padding-bottom:calc(10px + var(--sb));background:var(--w);box-shadow:0 -2px 10px rgba(0,0,0,.06);z-index:50}
+.sub-btn{width:100%;padding:13px;border:none;border-radius:24px;background:var(--y);color:var(--dk);font-family:var(--f);font-size:15px;font-weight:700;cursor:pointer}
+.sub-btn:active{transform:scale(.98);background:#E8AB00}
+.toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.85);background:rgba(0,0,0,.75);color:#fff;padding:12px 24px;border-radius:var(--rm);font-size:14px;font-weight:500;z-index:400;opacity:0;pointer-events:none;transition:all .3s}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.float-nav{position:fixed;right:16px;bottom:calc(80px + var(--sb));width:40px;height:40px;border-radius:50%;background:var(--y);border:none;box-shadow:0 2px 8px rgba(0,0,0,.15);display:none;align-items:center;justify-content:center;cursor:pointer;z-index:60}
+.float-nav.show{display:flex}
+.float-nav:active{transform:scale(.9)}
+.float-nav svg{width:20px;height:20px}
 </style>
 </head>
 <body>
 <div class="status-bar"></div>
-<nav class="nav-bar">
-  <button class="nav-bar__back" aria-label="返回">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-    值班教练反馈
-  </button>
-  <div class="nav-bar__actions">
-    <button class="nav-bar__btn" aria-label="更多"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
-    <button class="nav-bar__btn" aria-label="拍照"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></button>
+<nav class="nav">
+  <button class="nav-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>值班教练反馈</button>
+  <div class="nav-acts">
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 </nav>
-
-
-
-<main class="content">
-
-  <!-- ========== 值班总览 ========== -->
-  <!-- ========== 人员信息 ========== -->
-  <section class="card">
-    <div class="person-header">
-      <h2 class="person-header__title">人员信息</h2>
-      <button class="person-header__link">值班情况<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-    </div>
-    <div class="person-info">
-      <div class="person-avatar"><svg viewBox="0 0 24 24" width="32" height="32" fill="#FFBC0D" stroke="none"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-      <div>
-        <div class="person-name">刘翠翠 (Patrick Chen)</div>
-        <div class="person-meta"><span>工号：10065998</span><span>值班时间：2024.09.08</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ========== 值班总览 ========== -->
-  <div class="overview-card" id="overviewCard">
-    <div class="overview-header">
-      <div class="overview-header__left">
-        <!-- McD StoreOverview icon -->
-        <svg class="overview-header__icon" viewBox="64 64 896 896" fill="currentColor"><path d="M886 205.76a66 66 0 0166 66v66a66 66 0 01-62.12 65.89l-3.88.11v462a66 66 0 01-66 66H204a66 66 0 01-66-66v-462a66 66 0 01-66-66v-66a66 66 0 0166-66h748z" fill="#FFBC0D"/><path d="M732 71.74c24.3 0 44 19.75 44 44.1v815.93H380V115.85c0-24.36 19.7-44.1 44-44.1h308z" fill="#DB0007"/><path d="M632.65 162.23c40.58 0 72.32 98.37 72.32 219.66l-2.2 2.2h-31.19l-2.2-2.2c0-109.62-17.4-199.73-36.73-199.73-19.38 0-36.77 83.08-36.77 184.2l-2.2 2.2h-31.19l-2.2-2.2c0-101.12-17.4-184.2-36.77-184.2-19.35 0-36.78 90.2-36.78 199.73l-2.2 2.2h-31.18l-2.2-2.2c0-120.9 31.99-219.66 72.36-219.66 20.96 0 40 24.34 53.34 65.46l1.21 3.93 1.27-3.96c12.86-39.4 30.75-63.29 50.6-65.29l2.71-.14z" fill="#FFBC0D"/></svg>
-        <h2 class="overview-header__title">值班总览</h2>
-      </div>
-      <button class="overview-header__toggle" id="overviewToggle" aria-label="收起/展开">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </div>
-
-    <div class="overview-body" id="overviewBody">
-
-      <!-- AI 总结 -->
-      <div class="ai-summary" id="aiSummary">
-        <div class="ai-summary__header" id="aiHeader" style="cursor:pointer;">
-          <svg class="ai-summary__icon" width="18" height="18" viewBox="64 64 896 896" fill="#FFBC0D"><path d="M720.67 106.05l27.71 16a37.33 37.33 0 0113.66 51l-41.78 72.38c68.1 2.92 122.4 59.06 122.4 127.88v352c0 70.69-57.3 128-128 128H309.33c-70.7 0-128-57.31-128-128v-352c0-70.47 56.94-127.63 127.32-128l-41.73-72.26a37.33 37.33 0 0113.67-51l27.71-16a5.33 5.33 0 017.28 1.95l73.27 126.9a37.32 37.32 0 014.09 10.4h242.22c.8-2.58 1.9-5.11 3.32-7.56L713.38 108a5.33 5.33 0 017.29-1.95zm-6 213.92H309.32c-28.28 0-51.41 22-53.22 49.83l-.11 3.5v352c0 28.28 22 51.42 49.82 53.23l3.51.1h405.33c28.28 0 51.42-22 53.22-49.82l.12-3.5v-352c0-28.28-22-51.42-49.83-53.22l-3.5-.12zm-112 337a5.33 5.33 0 015.33 5.34v32a37.33 37.33 0 01-37.34 37.33H421.33a5.33 5.33 0 01-5.33-5.33v-32a37.33 37.33 0 0137.33-37.34h149.33zM373.32 426.64a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67zm277.33 0a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67z"/></svg>
-          <span class="ai-summary__label">AI 总结</span>
-          <svg id="aiChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--mcd-gray-500)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto;transition:transform 0.3s;"><polyline points="6 9 12 15 18 9"/></svg>
-        </div>
-        <div class="ai-summary__text" id="aiText" style="font-size:13px;color:var(--mcd-gray-700);line-height:1.8;">
-          <ul style="list-style:disc;padding-left:18px;margin:0;">
-            <li style="margin-bottom:6px;"><b>业务达成：</b>Sales 达 12940 元，低于目标 13622 元；尖峰 GC 达 346 略低于目标 358，其中 11:00-12:00 时段表现突出（108 vs 目标 77），MDS 渠道超额完成。</li>
-            <li style="margin-bottom:6px;"><b>客户满意：</b>OSAT 100%，达成目标；有 2 条 CCC 客诉记录，需关注服务细节。</li>
-            <li style="margin-bottom:6px;"><b>员工满意：</b>本班次认知了 3/12 位员工，建议关注更多员工的表现并给予认可。</li>
-            <li><b>值班表现：</b>基础任务完成率 92%，值班工具完成率 85%，整体值班表现良好。</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <div style="padding:0 20px 20px;">
-      <!-- 数据展示 (独立收起) -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <span style="font-size:15px;font-weight:700;color:var(--mcd-dark);">数据展示</span>
-        <button id="dataToggle" style="background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mcd-gray-500);">
-          <span id="dataToggleText">收起</span>
-          <svg id="dataChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.3s;"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-      </div>
-      <div id="dataBody" style="transition:max-height 0.35s ease,opacity 0.25s ease;overflow:hidden;">
-
-      <!-- 维度1: 业务达成 -->
-      <div class="dim-block">
-        <div class="dim-block__header">
-          <div class="dim-block__icon dim-block__icon--sales">
-            <!-- McD PieChartFilled -->
-            <svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M863.1 518.5H505.5V160.9c0-4.4-3.6-8-8-8h-26a398.57 398.57 0 00-282.5 117 397.47 397.47 0 00-85.6 127C82.6 446.2 72 498.5 72 552.5S82.6 658.7 103.4 708c20.1 47.5 48.9 90.3 85.6 127 36.7 36.7 79.4 65.5 127 85.6a396.64 396.64 0 00155.6 31.5 398.57 398.57 0 00282.5-117c36.7-36.7 65.5-79.4 85.6-127a396.64 396.64 0 0031.5-155.6v-26c-.1-4.4-3.7-8-8.1-8zM951 463l-2.6-28.2c-8.5-92-49.3-178.8-115.1-244.3A398.5 398.5 0 00588.4 75.6L560.1 73c-4.7-.4-8.7 3.2-8.7 7.9v383.7c0 4.4 3.6 8 8 8l383.6-1c4.7-.1 8.4-4 8-8.6z"/></svg>
-          </div>
-          <span class="dim-block__title">业务达成</span>
-        </div>
-
-        <!-- Sales -->
-        <div class="metric-row">
-          <div class="metric-row__left">
-            <div class="metric-row__label" style="font-size:15px;font-weight:700;color:var(--mcd-dark);">班次 Sales</div>
-            <div class="metric-row__sub">vs. 目标 13622</div>
-          </div>
-          <div class="metric-row__right">
-            <span class="metric-row__value">12940</span>
-            <span class="metric-row__diff metric-row__diff--down">↓ 682</span>
-          </div>
-        </div>
-
-        <!-- Sales by BE -->
-        <div style="padding-left:8px; margin-top:4px;">
-          <div class="metric-row">
-            <div class="metric-row__left"><div class="metric-row__label">FC Sales</div><div class="metric-row__sub">vs. 目标 5500</div></div>
-            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">5284</span><span class="metric-row__diff metric-row__diff--down">↓ 216</span></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-row__left"><div class="metric-row__label">MDS Sales</div><div class="metric-row__sub">vs. 目标 6200</div></div>
-            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">6503</span><span class="metric-row__diff metric-row__diff--up">↑ 303</span></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-row__left"><div class="metric-row__label">Kiosk Sales</div><div class="metric-row__sub">vs. 目标 50</div></div>
-            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">46</span><span class="metric-row__diff metric-row__diff--down">↓ 4</span></div>
-          </div>
-          <div class="metric-row">
-            <div class="metric-row__left"><div class="metric-row__label">McCafe Sales</div><div class="metric-row__sub">vs. 目标 1150</div></div>
-            <div class="metric-row__right"><span class="metric-row__value" style="font-size:16px;">1107</span><span class="metric-row__diff metric-row__diff--down">↓ 43</span></div>
-          </div>
-        </div>
-
-        <!-- Peak GC -->
-        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--mcd-gray-200);">
-          <div class="metric-row">
-            <div class="metric-row__left">
-              <div class="metric-row__label" style="font-size:15px;font-weight:700;color:var(--mcd-dark);">挑战尖峰 GC</div>
-              <div class="metric-row__sub">vs. 目标 358</div>
-            </div>
-            <div class="metric-row__right">
-              <span class="metric-row__value">346</span>
-              <span class="metric-row__diff metric-row__diff--down">↓ 12</span>
-            </div>
-          </div>
-          <div class="peak-slots">
-            <div class="peak-slot">
-              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--green"></span>08:00-09:00</div>
-              <div class="peak-slot__right">
-                <div><span class="peak-slot__val">105</span><div class="peak-slot__info">vs.目标 123</div></div>
-                <span class="peak-slot__diff peak-slot__diff--down">↓ 18</span>
-              </div>
-            </div>
-            <div class="peak-slot">
-              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--yellow"></span>11:00-12:00</div>
-              <div class="peak-slot__right">
-                <div><span class="peak-slot__val">108</span><div class="peak-slot__info">vs.目标 77</div></div>
-                <span class="peak-slot__diff peak-slot__diff--up">↑ 31</span>
-              </div>
-            </div>
-            <div class="peak-slot">
-              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--orange"></span>12:00-13:00</div>
-              <div class="peak-slot__right">
-                <div><span class="peak-slot__val">100</span><div class="peak-slot__info">vs.目标 119</div></div>
-                <span class="peak-slot__diff peak-slot__diff--down">↓ 19</span>
-              </div>
-            </div>
-            <div class="peak-slot">
-              <div class="peak-slot__time"><span class="peak-slot__dot peak-slot__dot--red"></span>13:00-14:00</div>
-              <div class="peak-slot__right">
-                <div><span class="peak-slot__val">33</span><div class="peak-slot__info">vs.目标 39</div></div>
-                <span class="peak-slot__diff peak-slot__diff--down">↓ 6</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- R2P -->
-        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed var(--mcd-gray-200);">
-          <div class="metric-row">
-            <div class="metric-row__left"><div class="metric-row__label" style="font-size:15px;font-weight:700;color:var(--mcd-dark);">R2P</div><div class="metric-row__sub">班次平均</div></div>
-            <div class="metric-row__right"><span class="metric-row__value">3.2<span style="font-size:13px;color:var(--mcd-gray-500);">min</span></span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 维度2: 客户满意 -->
-      <div class="dim-block">
-        <div class="dim-block__header">
-          <div class="dim-block__icon dim-block__icon--csat">
-            <!-- McD SmileFilled (顾客满意) -->
-            <svg viewBox="64 64 896 896" width="18" height="18" fill="#DA291C"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zM288 421a48.01 48.01 0 0196 0 48.01 48.01 0 01-96 0zm224 272c-85.5 0-155.6-67.3-160-151.6a8 8 0 018-8.4h48.1c4.2 0 7.8 3.2 8.1 7.4C420 589.9 461.5 629 512 629s92.1-39.1 95.8-88.6c.3-4.2 3.9-7.4 8.1-7.4H664a8 8 0 018 8.4C667.6 625.7 597.5 693 512 693zm176-224a48.01 48.01 0 010-96 48.01 48.01 0 010 96z"/></svg>
-          </div>
-          <span class="dim-block__title">客户满意</span>
-        </div>
-        <div class="metric-row">
-          <div class="metric-row__left">
-            <div class="metric-row__label" style="font-size:15px;font-weight:700;color:var(--mcd-dark);">班次 OSAT (00:00-14:00)</div>
-            <div class="metric-row__sub">vs. 目标 100%</div>
-          </div>
-          <div class="metric-row__right">
-            <span class="metric-row__value">100<span style="font-size:14px;">%</span></span>
-            <span class="metric-row__diff metric-row__diff--neutral">— 0</span>
-          </div>
-        </div>
-        <div class="metric-row">
-          <div class="metric-row__left">
-            <div class="metric-row__label" style="font-size:15px;font-weight:700;color:var(--mcd-dark);">CCC 客诉</div>
-          </div>
-          <div class="metric-row__right">
-            <span class="metric-row__value" style="color:var(--mcd-red);">2</span>
-          </div>
-        </div>
-        <div style="margin-top:8px;">
-          <div style="background:var(--mcd-gray-100);border-radius:8px;padding:12px;margin-bottom:8px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <span style="font-size:12px;font-weight:600;color:var(--mcd-dark);">订单 #MCD-20240908-1142</span>
-              <span style="font-size:11px;color:var(--mcd-gray-500);">11:42</span>
-            </div>
-            <div style="font-size:12px;color:var(--mcd-gray-700);line-height:1.6;">顾客反馈巨无霸汉堡缺少一片生菜，且薯条温度偏低，要求重新制作。</div>
-          </div>
-          <div style="background:var(--mcd-gray-100);border-radius:8px;padding:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <span style="font-size:12px;font-weight:600;color:var(--mcd-dark);">订单 #MCD-20240908-1315</span>
-              <span style="font-size:11px;color:var(--mcd-gray-500);">13:15</span>
-            </div>
-            <div style="font-size:12px;color:var(--mcd-gray-700);line-height:1.6;">顾客等待时间超过 15 分钟，麦乐送订单配送延迟，顾客致电投诉。</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 维度3: 员工满意 -->
-      <div class="dim-block">
-        <div class="dim-block__header">
-          <div class="dim-block__icon dim-block__icon--staff">
-            <!-- McD HeartFilled (员工满意) -->
-            <svg viewBox="64 64 896 896" width="18" height="18" fill="#DA291C"><path d="M923 283.6a260.04 260.04 0 00-56.9-82.8 264.4 264.4 0 00-84-55.5A265.34 265.34 0 00679.7 125c-49.3 0-97.4 13.5-139.2 39-10 6.1-19.5 12.8-28.5 20.1-9-7.3-18.5-14-28.5-20.1-41.8-25.5-89.9-39-139.2-39-35.5 0-69.9 6.8-102.4 20.3-31.4 13-59.7 31.7-84 55.5a258.44 258.44 0 00-56.9 82.8c-13.9 32.3-21 66.6-21 101.9 0 33.3 6.8 68 20.3 103.3 11.3 29.5 27.5 60.1 48.2 91 32.8 48.9 77.9 99.9 133.9 151.6 92.8 85.7 184.7 144.9 188.6 147.3l23.7 15.2c10.5 6.7 24 6.7 34.5 0l23.7-15.2c3.9-2.5 95.7-61.6 188.6-147.3 56-51.7 101.1-102.7 133.9-151.6 20.7-30.9 37-61.5 48.2-91 13.5-35.3 20.3-70 20.3-103.3.1-35.3-7-69.6-20.9-101.9z"/></svg>
-          </div>
-          <span class="dim-block__title">员工满意</span>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
-          <div style="font-size:14px;font-weight:600;color:var(--mcd-dark);">认知员工</div>
-          <div style="display:flex;align-items:baseline;gap:2px;">
-            <span style="font-size:28px;font-weight:900;color:var(--mcd-dark);">3</span>
-            <span style="font-size:18px;color:var(--mcd-gray-400);"> / </span>
-            <span style="font-size:16px;color:var(--mcd-gray-500);">12</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 维度4: 值班表现 -->
-      <div class="dim-block">
-        <div class="dim-block__header">
-          <div class="dim-block__icon dim-block__icon--perf">
-            <!-- McD DashboardOutlined -->
-            <svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M512 72c243 0 440 197 440 440a437.98 437.98 0 01-79.14 251.82 320.37 320.37 0 01-19.32 27.58c-6.8 8.7-14.2 17.26-22.2 25.7a6.6 6.6 0 01-8.85.66l-25.65-20.04a38.5 38.5 0 01-6.64-54.04L814.94 712l.81-1.18a360.84 360.84 0 0056.48-153.78h-29.18a38.5 38.5 0 01-38.5-38.5v-31.9a6.6 6.6 0 016.6-6.6h62.46a361.31 361.31 0 00-80.08-197.22l-21.7 21.7a38.5 38.5 0 01-54.45 0l-22.55-22.56a6.6 6.6 0 010-9.34l44.03-44.02a361.27 361.27 0 00-190.46-77.8v28.72a38.5 38.5 0 01-38.5 38.5H478a6.6 6.6 0 01-6.6-6.6l-.01-60.18a361.27 361.27 0 00-185.6 76.83l22.02 22a38.5 38.5 0 010 54.44l-22.56 22.56a6.6 6.6 0 01-9.33 0L231 282.18a361.32 361.32 0 00-80.61 197.87h31.75a38.5 38.5 0 0138.5 38.5v31.9a6.6 6.6 0 01-6.6 6.6h-62.27a360.84 360.84 0 0057.3 155.02l24.8 31.6a38.5 38.5 0 01-6.63 54.05l-25.66 20.04a6.6 6.6 0 01-8.85-.66c-8-8.44-15.4-17-22.2-25.7a329.49 329.49 0 01-18.8-26.7A438.16 438.16 0 0172 512C72 269 269 72 512 72z"/></svg>
-          </div>
-          <span class="dim-block__title">值班表现</span>
-        </div>
-        <div class="completion-row">
-          <div class="completion-item">
-            <div class="completion-item__label">基础任务完成率</div>
-            <div class="completion-item__bar"><div class="completion-item__fill completion-item__fill--green" style="width:92%;"></div></div>
-            <div class="completion-item__val">92%</div>
-          </div>
-          <div class="completion-item">
-            <div class="completion-item__label">值班工具完成率</div>
-            <div class="completion-item__bar"><div class="completion-item__fill completion-item__fill--yellow" style="width:85%;"></div></div>
-            <div class="completion-item__val">85%</div>
-          </div>
-        </div>
-      </div>
-      </div><!-- end dataBody -->
-
-    </div><!-- end data padding wrapper -->
+<main class="ct" id="mainContent">
+<!-- 人员信息 -->
+<section class="card" id="personCard">
+  <div class="ph"><span class="ph-t">人员信息</span><button class="pl">值班情况<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button></div>
+  <div class="pi">
+    <div class="pa"><svg viewBox="0 0 24 24" width="28" height="28" fill="#FFBC0D"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+    <div><div class="pn">刘翠翠 (Patrick Chen)</div><div class="pm"><span>工号：10065998</span><span>值班时间：2024.09.08</span></div></div>
   </div>
-
-  <!-- ========== 教练反馈 ========== -->
-  <section class="card">
-    <h2 class="section-title">教练反馈</h2>
-    <div class="sbia-card">
-      <div class="sbia-card__title">SBIA反馈</div>
-      <div class="sbia-card__badge">总结陈述</div>
-      <div class="sbia-card__flow">
-        <div class="sbia-card__step">
-          <div class="sbia-card__icon sbia-card__icon--s"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
-          <div class="sbia-card__label">情景</div>
-          <div class="sbia-card__sub">Situation</div>
-        </div>
-        <div class="sbia-card__arrow">→</div>
-        <div class="sbia-card__step">
-          <div class="sbia-card__icon sbia-card__icon--b"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div>
-          <div class="sbia-card__label">行为</div>
-          <div class="sbia-card__sub">Behavior</div>
-        </div>
-        <div class="sbia-card__arrow">→</div>
-        <div class="sbia-card__step">
-          <div class="sbia-card__icon sbia-card__icon--i"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
-          <div class="sbia-card__label">影响</div>
-          <div class="sbia-card__sub">Impact</div>
-        </div>
-        <div class="sbia-card__arrow">→</div>
-        <div class="sbia-card__step">
-          <div class="sbia-card__icon sbia-card__icon--a"><svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1z"/></svg></div>
-          <div class="sbia-card__label">行动</div>
-          <div class="sbia-card__sub">Action</div>
-        </div>
-      </div>
+</section>
+<!-- 值班总览 -->
+<div class="card" style="padding:0" id="overviewCard">
+<div class="ov-hdr">
+  <div class="ov-left">
+    <svg width="28" height="28" viewBox="64 64 896 896"><path d="M886 205.76a66 66 0 0166 66v66a66 66 0 01-62.12 65.89l-3.88.11v462a66 66 0 01-66 66H204a66 66 0 01-66-66v-462a66 66 0 01-66-66v-66a66 66 0 0166-66h748z" fill="#FFBC0D"/><path d="M732 71.74c24.3 0 44 19.75 44 44.1v815.93H380V115.85c0-24.36 19.7-44.1 44-44.1h308z" fill="#DB0007"/><path d="M632.65 162.23c40.58 0 72.32 98.37 72.32 219.66l-2.2 2.2h-31.19l-2.2-2.2c0-109.62-17.4-199.73-36.73-199.73-19.38 0-36.77 83.08-36.77 184.2l-2.2 2.2h-31.19l-2.2-2.2c0-101.12-17.4-184.2-36.77-184.2-19.35 0-36.78 90.2-36.78 199.73l-2.2 2.2h-31.18l-2.2-2.2c0-120.9 31.99-219.66 72.36-219.66 20.96 0 40 24.34 53.34 65.46l1.21 3.93 1.27-3.96c12.86-39.4 30.75-63.29 50.6-65.29l2.71-.14z" fill="#FFBC0D"/></svg>
+    <span class="ov-title">值班总览</span>
+  </div>
+  <button class="ov-tog" id="ovTog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+</div>
+<div class="ov-body" id="ovBody">
+<!-- AI -->
+<div class="ai">
+  <div class="ai-hdr" id="aiHdr">
+    <div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M720.67 106.05l27.71 16a37.33 37.33 0 0113.66 51l-41.78 72.38c68.1 2.92 122.4 59.06 122.4 127.88v352c0 70.69-57.3 128-128 128H309.33c-70.7 0-128-57.31-128-128v-352c0-70.47 56.94-127.63 127.32-128l-41.73-72.26a37.33 37.33 0 0113.67-51l27.71-16a5.33 5.33 0 017.28 1.95l73.27 126.9a37.32 37.32 0 014.09 10.4h242.22c.8-2.58 1.9-5.11 3.32-7.56L713.38 108a5.33 5.33 0 017.29-1.95zm-6 213.92H309.32c-28.28 0-51.41 22-53.22 49.83l-.11 3.5v352c0 28.28 22 51.42 49.82 53.23l3.51.1h405.33c28.28 0 51.42-22 53.22-49.82l.12-3.5v-352c0-28.28-22-51.42-49.83-53.22l-3.5-.12zm-112 337a5.33 5.33 0 015.33 5.34v32a37.33 37.33 0 01-37.34 37.33H421.33a5.33 5.33 0 01-5.33-5.33v-32a37.33 37.33 0 0137.33-37.34h149.33zM373.32 426.64a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67zm277.33 0a53.33 53.33 0 110 106.67 53.33 53.33 0 010-106.67z"/></svg></div>
+    <span class="ai-lbl">AI 总结</span>
+    <span class="ai-tg" id="aiTgTxt">收起</span>
+    <svg class="ai-chv" id="aiChv" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="ai-txt" id="aiTxt"><ul>
+    <li><b>业务达成：</b>Sales 12940，低于目标 13622；尖峰 GC 346 略低于目标 358，11-12点突出（108 vs 77），MDS 超额。</li>
+    <li><b>客户满意：</b>OSAT 100% 达标；2 条 CCC 客诉，需关注服务细节。</li>
+    <li><b>员工满意：</b>认知 3/12 位员工，建议多关注；工时达成率 108%。</li>
+    <li><b>值班表现：</b>基础任务 92%，值班工具 85%，整体良好。</li>
+  </ul></div>
+</div>
+<!-- 数据展示 -->
+<div class="dh"><span>数据展示</span><button class="dt" id="dataTog"><span id="dataTgTxt">收起</span><svg id="dataChv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .3s"><polyline points="6 9 12 15 18 9"/></svg></button></div>
+<div id="dataBody">
+<!-- 业务达成 -->
+<div class="dim">
+  <div class="dim-hdr"><div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M863.1 518.5H505.5V160.9c0-4.4-3.6-8-8-8h-26a398.57 398.57 0 00-282.5 117 397.47 397.47 0 00-85.6 127C82.6 446.2 72 498.5 72 552.5S82.6 658.7 103.4 708c20.1 47.5 48.9 90.3 85.6 127 36.7 36.7 79.4 65.5 127 85.6a396.64 396.64 0 00155.6 31.5 398.57 398.57 0 00282.5-117c36.7-36.7 65.5-79.4 85.6-127a396.64 396.64 0 0031.5-155.6v-26c-.1-4.4-3.7-8-8.1-8zM951 463l-2.6-28.2c-8.5-92-49.3-178.8-115.1-244.3A398.5 398.5 0 00588.4 75.6L560.1 73c-4.7-.4-8.7 3.2-8.7 7.9v383.7c0 4.4 3.6 8 8 8l383.6-1c4.7-.1 8.4-4 8-8.6z"/></svg></div><span class="dim-t">业务达成</span></div>
+  <div class="mr"><div><div class="ml-b">班次 Sales</div><div class="ms">vs. 目标 13622</div></div><div style="display:flex;align-items:baseline;gap:6px"><span class="mv">12940</span><span class="md md-d">↓682</span></div></div>
+  <div class="g2" style="margin:6px 0">
+    <div class="g2i"><div class="g2n">FC Sales · vs.5500</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">5284</span><span class="g2f" style="color:var(--r)">↓216</span></div></div>
+    <div class="g2i"><div class="g2n">MDS Sales · vs.6200</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">6503</span><span class="g2f" style="color:var(--gn)">↑303</span></div></div>
+    <div class="g2i"><div class="g2n">Kiosk Sales · vs.50</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">46</span><span class="g2f" style="color:var(--r)">↓4</span></div></div>
+    <div class="g2i"><div class="g2n">McCafe Sales · vs.1150</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">1107</span><span class="g2f" style="color:var(--r)">↓43</span></div></div>
+  </div>
+  <div style="border-top:1px dashed var(--g2);padding-top:8px;margin-top:4px">
+    <div class="mr"><div><div class="ml-b">挑战尖峰 GC</div><div class="ms">vs. 目标 358</div></div><div style="display:flex;align-items:baseline;gap:6px"><span class="mv">346</span><span class="md md-d">↓12</span></div></div>
+    <div class="g2" style="margin-top:6px">
+      <div class="g2i"><div class="g2t"><span class="g2d" style="background:var(--gn)"></span>08-09:00</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">105</span><span class="g2f" style="color:var(--r)">↓18</span></div><div class="g2n">vs.123</div></div>
+      <div class="g2i"><div class="g2t"><span class="g2d" style="background:var(--y)"></span>11-12:00</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">108</span><span class="g2f" style="color:var(--gn)">↑31</span></div><div class="g2n">vs.77</div></div>
+      <div class="g2i"><div class="g2t"><span class="g2d" style="background:var(--or)"></span>12-13:00</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">100</span><span class="g2f" style="color:var(--r)">↓19</span></div><div class="g2n">vs.119</div></div>
+      <div class="g2i"><div class="g2t"><span class="g2d" style="background:var(--r)"></span>13-14:00</div><div style="display:flex;align-items:baseline;gap:4px"><span class="g2v">33</span><span class="g2f" style="color:var(--r)">↓6</span></div><div class="g2n">vs.39</div></div>
     </div>
-    <div class="divider"></div>
-
-    <!-- Tab Switcher -->
-    <div class="tab-bar">
-      <button class="tab-item active" data-tab="dowell"><span class="tab-item__dot tab-item__dot--green"></span>Do Well<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
-      <button class="tab-item" data-tab="dobetter"><span class="tab-item__dot tab-item__dot--orange"></span>Do Better<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
-      <button class="tab-item" data-tab="donext"><span class="tab-item__dot tab-item__dot--blue"></span>Do Next<span class="tab-item__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
-    </div>
-
-    <div class="feedback-panel active" id="panel-dowell">
-      <div class="fp__header"><span class="fp__ind fp__ind--g"></span><span class="fp__title">Do Well!</span></div>
-      <p class="fp__sub">做得好的，继续保持的方面！</p>
-      <div class="tags-row">
-        <button class="tag" data-tag="顾客体验" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
-        <button class="tag" data-tag="员工体验" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
-        <button class="tag" data-tag="业务达成" data-block-id="dowell"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
-      </div>
-      <div class="guide-text" data-guide="dowell"></div>
-      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="dowell"></textarea></div>
-    </div>
-
-    <div class="feedback-panel" id="panel-dobetter">
-      <div class="fp__header"><span class="fp__ind fp__ind--o"></span><span class="fp__title">Do Better!</span></div>
-      <p class="fp__sub">可以做得更好的，有待改进的方面！</p>
-      <div class="tags-row">
-        <button class="tag" data-tag="顾客体验" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
-        <button class="tag" data-tag="员工体验" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
-        <button class="tag" data-tag="业务达成" data-block-id="dobetter"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
-      </div>
-      <div class="guide-text" data-guide="dobetter"></div>
-      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="dobetter"></textarea></div>
-    </div>
-
-    <div class="feedback-panel" id="panel-donext">
-      <div class="fp__header"><span class="fp__ind fp__ind--b"></span><span class="fp__title">Do Next!</span></div>
-      <p class="fp__sub">下一步行动，从哪些行为方面做出改变？</p>
-      <div class="tags-row">
-        <button class="tag" data-tag="顾客体验" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button>
-        <button class="tag" data-tag="员工体验" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button>
-        <button class="tag" data-tag="业务达成" data-block-id="donext"><span class="tag__check"><svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button>
-      </div>
-      <div class="guide-text" data-guide="donext"></div>
-      <div class="textarea-wrap"><textarea placeholder="请选择标签(多选)后再根据指引填写" disabled data-block-id="donext"></textarea></div>
-    </div>
-  </section>
+  </div>
+  <div style="border-top:1px dashed var(--g2);padding-top:8px;margin-top:8px">
+    <div class="mr" style="border:none"><div><div class="ml-b">R2P</div><div class="ms">班次平均</div></div><div><span class="mv">3.2<span style="font-size:13px;color:var(--g5)">min</span></span></div></div>
+  </div>
+</div>
+<!-- 客户满意 -->
+<div class="dim">
+  <div class="dim-hdr"><div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#DA291C"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zM288 421a48.01 48.01 0 0196 0 48.01 48.01 0 01-96 0zm224 272c-85.5 0-155.6-67.3-160-151.6a8 8 0 018-8.4h48.1c4.2 0 7.8 3.2 8.1 7.4C420 589.9 461.5 629 512 629s92.1-39.1 95.8-88.6c.3-4.2 3.9-7.4 8.1-7.4H664a8 8 0 018 8.4C667.6 625.7 597.5 693 512 693zm176-224a48.01 48.01 0 010-96 48.01 48.01 0 010 96z"/></svg></div><span class="dim-t">客户满意</span></div>
+  <div class="mr"><div><div class="ml-b">班次 OSAT (00:00-14:00)</div><div class="ms">vs. 目标 100%</div></div><div style="display:flex;align-items:baseline;gap:6px"><span class="mv">100<span style="font-size:14px">%</span></span><span class="md md-n">— 0</span></div></div>
+  <div class="mr" style="border:none"><div><div class="ml-b">CCC 客诉</div></div><div><span class="mv" style="color:var(--r)">2</span></div></div>
+  <div class="cc"><div class="cc-t"><span class="cc-id">订单 #MCD-20240908-1142</span><span class="cc-tm">11:42</span></div><div class="cc-d">顾客反馈巨无霸缺少一片生菜，薯条温度偏低，要求重新制作。</div></div>
+  <div class="cc"><div class="cc-t"><span class="cc-id">订单 #MCD-20240908-1315</span><span class="cc-tm">13:15</span></div><div class="cc-d">顾客等待超 15 分钟，麦乐送配送延迟，致电投诉。</div></div>
+</div>
+<!-- 员工满意 -->
+<div class="dim">
+  <div class="dim-hdr"><div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#DA291C"><path d="M923 283.6a260.04 260.04 0 00-56.9-82.8 264.4 264.4 0 00-84-55.5A265.34 265.34 0 00679.7 125c-49.3 0-97.4 13.5-139.2 39-10 6.1-19.5 12.8-28.5 20.1-9-7.3-18.5-14-28.5-20.1-41.8-25.5-89.9-39-139.2-39-35.5 0-69.9 6.8-102.4 20.3-31.4 13-59.7 31.7-84 55.5a258.44 258.44 0 00-56.9 82.8c-13.9 32.3-21 66.6-21 101.9 0 33.3 6.8 68 20.3 103.3 11.3 29.5 27.5 60.1 48.2 91 32.8 48.9 77.9 99.9 133.9 151.6 92.8 85.7 184.7 144.9 188.6 147.3l23.7 15.2c10.5 6.7 24 6.7 34.5 0l23.7-15.2c3.9-2.5 95.7-61.6 188.6-147.3 56-51.7 101.1-102.7 133.9-151.6 20.7-30.9 37-61.5 48.2-91 13.5-35.3 20.3-70 20.3-103.3.1-35.3-7-69.6-20.9-101.9z"/></svg></div><span class="dim-t">员工满意</span></div>
+  <div class="sr">
+    <div class="sc"><div class="sp">25%</div><div class="sw">3 / 12</div><div class="sl">认知员工</div></div>
+    <div class="sc"><div class="sp">108%</div><div class="sw">75.7h / 70h</div><div class="sl">工时达成率</div></div>
+  </div>
+</div>
+<!-- 值班表现 -->
+<div class="dim">
+  <div class="dim-hdr"><div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M512 72c243 0 440 197 440 440a437.98 437.98 0 01-79.14 251.82c-6.8 8.7-14.2 17.26-22.2 25.7a6.6 6.6 0 01-8.85.66l-25.65-20.04a38.5 38.5 0 01-6.64-54.04L814.94 712a360.84 360.84 0 0056.48-153.78h-29.18a38.5 38.5 0 01-38.5-38.5v-31.9a6.6 6.6 0 016.6-6.6h62.46a361.31 361.31 0 00-80.08-197.22l-21.7 21.7a38.5 38.5 0 01-54.45 0l-22.55-22.56a6.6 6.6 0 010-9.34l44.03-44.02a361.27 361.27 0 00-190.46-77.8v28.72a38.5 38.5 0 01-38.5 38.5H478a6.6 6.6 0 01-6.6-6.6l-.01-60.18a361.27 361.27 0 00-185.6 76.83l22.02 22a38.5 38.5 0 010 54.44l-22.56 22.56a6.6 6.6 0 01-9.33 0L231 282.18a361.32 361.32 0 00-80.61 197.87h31.75a38.5 38.5 0 0138.5 38.5v31.9a6.6 6.6 0 01-6.6 6.6h-62.27a360.84 360.84 0 0057.3 155.02l24.8 31.6a38.5 38.5 0 01-6.63 54.05l-25.66 20.04a6.6 6.6 0 01-8.85-.66c-8-8.44-15.4-17-22.2-25.7A438.16 438.16 0 0172 512C72 269 269 72 512 72z"/></svg></div><span class="dim-t">值班表现</span></div>
+  <div class="cr">
+    <div class="ci"><div class="cl">基础任务完成率</div><div class="cb"><div class="cf" style="width:92%;background:var(--y)"></div></div><div class="cv">92%</div></div>
+    <div class="ci"><div class="cl">值班工具完成率</div><div class="cb"><div class="cf" style="width:85%;background:var(--r)"></div></div><div class="cv">85%</div></div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+<!-- 教练反馈 -->
+<section class="card" id="feedbackCard">
+<div class="sh">
+  <div class="ib"><svg viewBox="64 64 896 896" width="18" height="18" fill="#FFBC0D"><path d="M889.6 842.67a6.4 6.4 0 016.4 6.4V880a37.33 37.33 0 01-37.33 37.34H134.4a6.4 6.4 0 01-6.4-6.4V880a37.33 37.33 0 0137.33-37.33H889.6zM696.5 138.03l45.25 45.26c41.65 41.65 41.65 109.2 0 150.85L367.72 708.17a85.33 85.33 0 01-59.96 24.99l-118.81.53a42.67 42.67 0 01-42.69-38.79l-.17-4.06.53-118.82a85.33 85.33 0 0125-59.96l374.02-374.03c41.66-41.65 109.2-41.65 150.85 0zM490.25 298.98L224.41 564.86l-.43.47 90.43 90.43.51-.4L580.78 389.5l-90.52-90.52zm110.46-110.23l-2.28 2.08-55.38 55.35 90.52 90.52 55.37-55.36a32 32 0 002.08-42.97l-2.08-2.28-45.25-45.26a32 32 0 00-42.98-2.08z"/></svg></div>
+  <span class="st">教练反馈</span>
+  <button class="tips-btn" id="tipsBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span id="tipsBtnTxt">填写Tips</span></button>
+</div>
+<div class="tips-p" id="tipsPanel">
+  <div class="sbia">
+    <div class="sbia-s"><div class="sbia-i sbia-i--s"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><div class="sbia-l">情景</div><div class="sbia-u">Situation</div></div>
+    <div class="sbia-a">→</div>
+    <div class="sbia-s"><div class="sbia-i sbia-i--b"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></div><div class="sbia-l">行为</div><div class="sbia-u">Behavior</div></div>
+    <div class="sbia-a">→</div>
+    <div class="sbia-s"><div class="sbia-i sbia-i--i"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div><div class="sbia-l">影响</div><div class="sbia-u">Impact</div></div>
+    <div class="sbia-a">→</div>
+    <div class="sbia-s"><div class="sbia-i sbia-i--a"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1z"/></svg></div><div class="sbia-l">行动</div><div class="sbia-u">Action</div></div>
+  </div>
+</div>
+<div style="height:1px;background:var(--g2);margin:0 0 14px"></div>
+<div class="tb">
+  <button class="ti active" data-tab="dowell"><span class="td td-g"></span>Do Well<span class="tc"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+  <button class="ti" data-tab="dobetter"><span class="td td-o"></span>Do Better<span class="tc"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+  <button class="ti" data-tab="donext"><span class="td td-b"></span>Do Next<span class="tc"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span></button>
+</div>
+<div class="fp active" id="panel-dowell"><div class="fp-h"><span class="fp-i fp-ig"></span><span class="fp-t">Do Well!</span></div><p class="fp-s">做得好的，继续保持！</p><div class="tgs"><button class="tg" data-tag="顾客体验" data-block-id="dowell"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button><button class="tg" data-tag="员工体验" data-block-id="dowell"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button><button class="tg" data-tag="业务达成" data-block-id="dowell"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button></div><div class="gd" data-guide="dowell"></div><textarea placeholder="请选择标签后根据指引填写" disabled data-block-id="dowell"></textarea></div>
+<div class="fp" id="panel-dobetter"><div class="fp-h"><span class="fp-i fp-io"></span><span class="fp-t">Do Better!</span></div><p class="fp-s">可以做得更好的方面！</p><div class="tgs"><button class="tg" data-tag="顾客体验" data-block-id="dobetter"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button><button class="tg" data-tag="员工体验" data-block-id="dobetter"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button><button class="tg" data-tag="业务达成" data-block-id="dobetter"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button></div><div class="gd" data-guide="dobetter"></div><textarea placeholder="请选择标签后根据指引填写" disabled data-block-id="dobetter"></textarea></div>
+<div class="fp" id="panel-donext"><div class="fp-h"><span class="fp-i fp-ib"></span><span class="fp-t">Do Next!</span></div><p class="fp-s">下一步行动计划！</p><div class="tgs"><button class="tg" data-tag="顾客体验" data-block-id="donext"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>顾客体验</button><button class="tg" data-tag="员工体验" data-block-id="donext"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>员工体验</button><button class="tg" data-tag="业务达成" data-block-id="donext"><span class="tg-c"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>业务达成</button></div><div class="gd" data-guide="donext"></div><textarea placeholder="请选择标签后根据指引填写" disabled data-block-id="donext"></textarea></div>
+</section>
 </main>
-<div class="submit-bar"><button class="submit-btn" id="submitBtn">下一个</button></div>
+<div class="sub-bar"><button class="sub-btn" id="submitBtn">下一个</button></div>
 <div class="toast" id="toast"></div>
-
+<button class="float-nav" id="floatNav"><svg id="floatSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline id="floatPoly" points="18 15 12 9 6 15"/></svg></button>
 <script>
-// ===== Overview toggle =====
-var overviewToggle = document.getElementById('overviewToggle');
-var overviewBody = document.getElementById('overviewBody');
-var dataWrapper = document.querySelector('.overview-card > div[style*="padding:0 20px 20px"]');
-overviewToggle.addEventListener('click', function() {
-  this.classList.toggle('collapsed');
-  overviewBody.classList.toggle('collapsed');
-  if (dataWrapper) {
-    dataWrapper.style.display = overviewBody.classList.contains('collapsed') ? 'none' : '';
-  }
-});
-
-// ===== AI Summary toggle =====
-var aiHeader = document.getElementById('aiHeader');
-var aiText = document.getElementById('aiText');
-var aiChevron = document.getElementById('aiChevron');
-var aiExpanded = true;
-aiHeader.addEventListener('click', function() {
-  aiExpanded = !aiExpanded;
-  aiText.style.display = aiExpanded ? 'block' : 'none';
-  aiChevron.style.transform = aiExpanded ? '' : 'rotate(180deg)';
-});
-
-// ===== Data展示 toggle =====
-var dataToggle = document.getElementById('dataToggle');
-var dataBody = document.getElementById('dataBody');
-var dataChevron = document.getElementById('dataChevron');
-var dataToggleText = document.getElementById('dataToggleText');
-var dataExpanded = true;
-dataToggle.addEventListener('click', function() {
-  dataExpanded = !dataExpanded;
-  dataBody.style.display = dataExpanded ? 'block' : 'none';
-  dataToggleText.textContent = dataExpanded ? '收起' : '展开';
-  dataChevron.style.transform = dataExpanded ? '' : 'rotate(180deg)';
-});
-
-// ===== Feedback logic (same as option-3) =====
-var GUIDE_MAP = {
-  '顾客体验': ['顾客满意度', '服务效率', '问题解决', '顾客互动'],
-  '员工体验': ['工作积极性', '团队协作', '员工关怀', '训练成长'],
-  '业务达成': ['营业额达成', '食品安全', '运营效率', '成本管控']
-};
-var BLOCK_SUFFIX = { dowell: '等方面夸夸！', dobetter: '等方面聊聊！', donext: '等方面制定计划！' };
-var TABS = ['dowell', 'dobetter', 'donext'];
-var state = { dowell: new Set(), dobetter: new Set(), donext: new Set() };
-var userContent = { dowell: '', dobetter: '', donext: '' };
-var currentTab = 'dowell';
-
-function switchTab(tabId) {
-  currentTab = tabId;
-  document.querySelectorAll('.tab-item').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelector('.tab-item[data-tab="' + tabId + '"]').classList.add('active');
-  document.querySelectorAll('.feedback-panel').forEach(function(p) { p.classList.remove('active'); });
-  document.getElementById('panel-' + tabId).classList.add('active');
-  updateSubmitBtn();
-}
-
-document.querySelectorAll('.tab-item').forEach(function(tab) {
-  tab.addEventListener('click', function() { switchTab(this.dataset.tab); });
-});
-
-document.querySelectorAll('.tag').forEach(function(tag) {
-  tag.addEventListener('click', function() {
-    var blockId = this.dataset.blockId, tagName = this.dataset.tag;
-    if (state[blockId].has(tagName)) { state[blockId].delete(tagName); this.classList.remove('active'); }
-    else { state[blockId].add(tagName); this.classList.add('active'); }
-    updateTextarea(blockId);
-    updateSubmitBtn();
-  });
-});
-
-function updateTextarea(blockId) {
-  var ta = document.querySelector('textarea[data-block-id="' + blockId + '"]');
-  var guideEl = document.querySelector('.guide-text[data-guide="' + blockId + '"]');
-  var tags = Array.from(state[blockId]);
-  if (tags.length === 0) {
-    guideEl.textContent = ''; guideEl.classList.remove('visible');
-    if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请选择标签(多选)后再根据指引填写'; }
-    ta.disabled = true; return;
-  }
-  guideEl.textContent = buildGuide(blockId, tags);
-  guideEl.classList.add('visible');
-  ta.disabled = false;
-  if (userContent[blockId].trim().length === 0) { ta.value = ''; ta.placeholder = '请在此输入反馈内容...'; ta.style.color = ''; }
-}
-
-function buildGuide(blockId, tags) {
-  var suffix = BLOCK_SUFFIX[blockId];
-  return tags.map(function(t) { return '• ' + t + '：从' + (GUIDE_MAP[t] || []).join('、') + suffix; }).join('\n');
-}
-
-document.querySelectorAll('textarea').forEach(function(ta) {
-  var blockId = ta.dataset.blockId;
-  if (!blockId) return;
-  ta.addEventListener('blur', function() { userContent[blockId] = this.value; updateCompleted(blockId); updateSubmitBtn(); });
-  ta.addEventListener('input', function() {
-    userContent[blockId] = this.value; this.style.color = '';
-    this.style.height = 'auto'; this.style.height = Math.max(180, this.scrollHeight) + 'px';
-    updateCompleted(blockId); updateSubmitBtn();
-  });
-});
-
-function isBlockCompleted(blockId) { return userContent[blockId].trim().length > 0 && state[blockId].size > 0; }
-function updateCompleted(blockId) {
-  var tab = document.querySelector('.tab-item[data-tab="' + blockId + '"]');
-  if (isBlockCompleted(blockId)) tab.classList.add('completed'); else tab.classList.remove('completed');
-}
-
-var submitBtn = document.getElementById('submitBtn');
-function updateSubmitBtn() {
-  var allDone = TABS.every(isBlockCompleted);
-  submitBtn.textContent = allDone ? '去提交' : '下一个';
-}
-
-submitBtn.addEventListener('click', function() {
-  var allDone = TABS.every(isBlockCompleted);
-  if (allDone) {
-    var t = document.getElementById('toast'); t.textContent = '反馈提交成功 ✓';
-    t.classList.add('show'); setTimeout(function() { t.classList.remove('show'); }, 2000);
-    return;
-  }
-  var curIdx = TABS.indexOf(currentTab);
-  for (var i = 1; i <= TABS.length; i++) {
-    var nextIdx = (curIdx + i) % TABS.length;
-    if (!isBlockCompleted(TABS[nextIdx])) {
-      switchTab(TABS[nextIdx]);
-      document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-  }
-});
-updateSubmitBtn();
+// Overview toggle
+var ovTog=document.getElementById('ovTog'),ovBody=document.getElementById('ovBody');
+ovTog.onclick=function(){this.classList.toggle('flip');ovBody.classList.toggle('hide')};
+// AI toggle
+var aiHdr=document.getElementById('aiHdr'),aiTxt=document.getElementById('aiTxt'),aiChv=document.getElementById('aiChv'),aiTgTxt=document.getElementById('aiTgTxt'),aiOn=true;
+aiHdr.onclick=function(){aiOn=!aiOn;aiTxt.style.display=aiOn?'':'none';aiChv.style.transform=aiOn?'':'rotate(180deg)';aiTgTxt.textContent=aiOn?'收起':'展开'};
+// Data toggle
+var dataTog=document.getElementById('dataTog'),dataBody=document.getElementById('dataBody'),dataChv=document.getElementById('dataChv'),dataTgTxt=document.getElementById('dataTgTxt'),dataOn=true;
+dataTog.onclick=function(){dataOn=!dataOn;dataBody.style.display=dataOn?'':'none';dataChv.style.transform=dataOn?'':'rotate(180deg)';dataTgTxt.textContent=dataOn?'收起':'展开'};
+// Tips toggle
+var tipsBtn=document.getElementById('tipsBtn'),tipsPanel=document.getElementById('tipsPanel'),tipsBtnTxt=document.getElementById('tipsBtnTxt'),tipsOn=false;
+tipsBtn.onclick=function(){tipsOn=!tipsOn;tipsPanel.classList.toggle('show');tipsBtnTxt.textContent=tipsOn?'收起Tips':'填写Tips'};
+// Tabs
+var GUIDE_MAP={'顾客体验':['顾客满意度','服务效率','问题解决','顾客互动'],'员工体验':['工作积极性','团队协作','员工关怀','训练成长'],'业务达成':['营业额达成','食品安全','运营效率','成本管控']};
+var SUFFIX={dowell:'等方面夸夸！',dobetter:'等方面聊聊！',donext:'等方面制定计划！'};
+var TABS=['dowell','dobetter','donext'],state={dowell:new Set,dobetter:new Set,donext:new Set},uc={dowell:'',dobetter:'',donext:''},curTab='dowell';
+function switchTab(t){curTab=t;document.querySelectorAll('.ti').forEach(function(e){e.classList.remove('active')});document.querySelector('.ti[data-tab="'+t+'"]').classList.add('active');document.querySelectorAll('.fp').forEach(function(e){e.classList.remove('active')});document.getElementById('panel-'+t).classList.add('active');updBtn()}
+document.querySelectorAll('.ti').forEach(function(e){e.onclick=function(){switchTab(this.dataset.tab)}});
+document.querySelectorAll('.tg').forEach(function(e){e.onclick=function(){var b=this.dataset.blockId,n=this.dataset.tag;if(state[b].has(n)){state[b].delete(n);this.classList.remove('active')}else{state[b].add(n);this.classList.add('active')}updTA(b);updBtn()}});
+function updTA(b){var ta=document.querySelector('textarea[data-block-id="'+b+'"]'),g=document.querySelector('.gd[data-guide="'+b+'"]'),tags=Array.from(state[b]);if(!tags.length){g.textContent='';g.classList.remove('visible');if(!uc[b].trim())ta.value='';ta.placeholder='请选择标签后根据指引填写';ta.disabled=true;return}g.textContent=tags.map(function(t){return'• '+t+'：从'+(GUIDE_MAP[t]||[]).join('、')+SUFFIX[b]}).join('\n');g.classList.add('visible');ta.disabled=false;if(!uc[b].trim()){ta.value='';ta.placeholder='请在此输入反馈内容...'}}
+document.querySelectorAll('textarea').forEach(function(ta){var b=ta.dataset.blockId;if(!b)return;ta.onblur=function(){uc[b]=this.value;updComp(b);updBtn()};ta.oninput=function(){uc[b]=this.value;this.style.height='auto';this.style.height=Math.max(160,this.scrollHeight)+'px';updComp(b);updBtn()}});
+function isDone(b){return uc[b].trim().length>0&&state[b].size>0}
+function updComp(b){var t=document.querySelector('.ti[data-tab="'+b+'"]');isDone(b)?t.classList.add('completed'):t.classList.remove('completed')}
+var subBtn=document.getElementById('submitBtn');
+function updBtn(){subBtn.textContent=TABS.every(isDone)?'去提交':'下一个'}
+subBtn.onclick=function(){if(TABS.every(isDone)){var t=document.getElementById('toast');t.textContent='反馈提交成功 ✓';t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2000);return}var i=TABS.indexOf(curTab);for(var j=1;j<=TABS.length;j++){var n=(i+j)%TABS.length;if(!isDone(TABS[n])){switchTab(TABS[n]);document.getElementById('feedbackCard').scrollIntoView({behavior:'smooth',block:'start'});return}}};
+updBtn();
+// Float nav button
+var floatNav=document.getElementById('floatNav'),floatPoly=document.getElementById('floatPoly'),feedbackCard=document.getElementById('feedbackCard'),overviewCard=document.getElementById('overviewCard'),isUp=true;
+function checkFloat(){var r=feedbackCard.getBoundingClientRect();if(r.top<window.innerHeight*0.8){floatNav.classList.add('show')}else{floatNav.classList.remove('show')}}
+window.addEventListener('scroll',checkFloat);
+floatNav.onclick=function(){if(isUp){overviewCard.scrollIntoView({behavior:'smooth',block:'start'});isUp=false;floatPoly.setAttribute('points','6 9 12 15 18 9')}else{feedbackCard.scrollIntoView({behavior:'smooth',block:'start'});isUp=true;floatPoly.setAttribute('points','18 15 12 9 6 15')}};
 </script>
 </body>
 </html>
