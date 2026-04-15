@@ -53,8 +53,7 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ===== 值班总览 Section ===== */
-.overview-card { background: var(--mcd-white); border-radius: var(--radius-lg); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: visible; animation: fadeInUp 0.4s ease backwards; }
-.overview-sticky { position: sticky; top: calc(88px + var(--safe-top)); z-index: 40; background: var(--mcd-white); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding-bottom: 4px; }
+.overview-card { background: var(--mcd-white); border-radius: var(--radius-lg); margin-bottom: 16px; box-shadow: var(--shadow-card); overflow: hidden; animation: fadeInUp 0.4s ease backwards; }
 .overview-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 14px; }
 .overview-header__left { display: flex; align-items: center; gap: 8px; }
 .overview-header__icon { width: 28px; height: 28px; }
@@ -224,7 +223,6 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
 
   <!-- ========== 值班总览 ========== -->
   <div class="overview-card" id="overviewCard">
-    <div class="overview-sticky" id="overviewSticky">
     <div class="overview-header">
       <div class="overview-header__left">
         <!-- McD StoreOverview icon -->
@@ -235,6 +233,18 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
     </div>
+
+    <!-- 人员信息 (moved inside overview) -->
+    <div style="padding:0 20px 16px;">
+      <div class="person-info">
+        <div class="person-avatar"><svg viewBox="0 0 24 24" width="32" height="32" fill="#FFBC0D" stroke="none"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+        <div>
+          <div class="person-name">刘翠翠 (Patrick Chen)</div>
+          <div class="person-meta"><span>工号：10065998</span><span>值班时间：2024.09.08</span></div>
+        </div>
+      </div>
+    </div>
+
     <div class="overview-body" id="overviewBody">
 
       <!-- AI 总结 -->
@@ -249,7 +259,6 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
         </div>
       </div>
     </div>
-    </div><!-- end overview-sticky -->
 
     <div style="padding:0 20px 20px;">
       <!-- 数据展示 (独立收起) -->
@@ -430,21 +439,6 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
     </div><!-- end data padding wrapper -->
   </div>
 
-  <!-- ========== 人员信息 ========== -->
-  <section class="card">
-    <div class="person-header">
-      <h2 class="person-header__title">人员信息</h2>
-      <button class="person-header__link">值班情况<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-    </div>
-    <div class="person-info">
-      <div class="person-avatar"><svg viewBox="0 0 24 24" width="32" height="32" fill="#FFBC0D" stroke="none"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
-      <div>
-        <div class="person-name">刘翠翠 (Patrick Chen)</div>
-        <div class="person-meta"><span>工号：10065998</span><span>值班时间：2024.09.08</span></div>
-      </div>
-    </div>
-  </section>
-
   <!-- ========== 教练反馈 ========== -->
   <section class="card">
     <h2 class="section-title">教练反馈</h2>
@@ -527,15 +521,15 @@ body { font-family: var(--font); background: var(--mcd-bg); color: var(--mcd-dar
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== Overview toggle (collapses entire card below header) =====
+// ===== Overview toggle =====
 var overviewToggle = document.getElementById('overviewToggle');
 var overviewBody = document.getElementById('overviewBody');
-var dataPaddingWrapper = document.querySelector('.overview-card > div:last-child');
+var dataWrapper = document.querySelector('.overview-card > div[style*="padding:0 20px 20px"]');
 overviewToggle.addEventListener('click', function() {
   this.classList.toggle('collapsed');
   overviewBody.classList.toggle('collapsed');
-  if (dataPaddingWrapper) {
-    dataPaddingWrapper.style.display = overviewBody.classList.contains('collapsed') ? 'none' : '';
+  if (dataWrapper) {
+    dataWrapper.style.display = overviewBody.classList.contains('collapsed') ? 'none' : '';
   }
 });
 
