@@ -190,12 +190,7 @@ textarea.err{border-color:var(--r) !important;box-shadow:0 0 0 3px rgba(218,41,2
     <span class="ai-tg" id="aiTgTxt">收起</span>
     <svg class="ai-chv" id="aiChv" viewBox="0 0 24 24" fill="none" stroke="var(--g5)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
-  <div class="ai-txt" id="aiTxt"><ul>
-    <li><b>业务达成：</b>Sales 低于目标 682 元，MDS 超额亮眼；尖峰 GC 11-12点大幅超标，夸夸调度能力！</li>
-    <li><b>客户满意：</b>OSAT 达标，但有 2 条客诉（1条L4未解决），聊聊改进方向。</li>
-    <li><b>员工满意：</b>认知员工仅 25%，建议多关注员工、及时认可。</li>
-    <li><b>值班表现：</b>待办完成率 80%，有 30% 待办@了他人，关注待办闭环和自主执行。</li>
-  </ul></div>
+  <div class="ai-txt" id="aiTxt"></div>
 </div>
 <!-- 数据展示 -->
 <div class="dh"><span>数据展示</span><button class="dt" id="dataTog"><span id="dataTgTxt">收起</span><svg id="dataChv" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .3s"><polyline points="6 9 12 15 18 9"/></svg></button></div>
@@ -363,6 +358,43 @@ function checkFloat(){
 }
 window.addEventListener('scroll',checkFloat);
 checkFloat();
+// AI typewriter effect
+(function(){
+  var lines=[
+    {bold:'业务达成：',text:'Sales 低于目标 682 元，MDS 超额亮眼；尖峰 GC 11-12点大幅超标，夸夸调度能力！'},
+    {bold:'客户满意：',text:'OSAT 达标，但有 2 条客诉（1条L4未解决），聊聊改进方向。'},
+    {bold:'员工满意：',text:'认知员工仅 25%，建议多关注员工、及时认可。'},
+    {bold:'值班表现：',text:'待办完成率 80%，有 30% 待办@了他人，关注待办闭环和自主执行。'}
+  ];
+  var container=document.getElementById('aiTxt');
+  var ul=document.createElement('ul');
+  container.appendChild(ul);
+  var lineIdx=0,charIdx=0,currentLi=null,currentSpan=null,speed=30;
+  function typeNext(){
+    if(lineIdx>=lines.length)return;
+    if(!currentLi){
+      currentLi=document.createElement('li');
+      if(lineIdx>0)currentLi.style.marginTop='4px';
+      var b=document.createElement('b');
+      b.textContent=lines[lineIdx].bold;
+      currentLi.appendChild(b);
+      currentSpan=document.createElement('span');
+      currentLi.appendChild(currentSpan);
+      ul.appendChild(currentLi);
+      charIdx=0;
+    }
+    var txt=lines[lineIdx].text;
+    if(charIdx<txt.length){
+      currentSpan.textContent+=txt[charIdx];
+      charIdx++;
+      setTimeout(typeNext,speed);
+    }else{
+      lineIdx++;currentLi=null;currentSpan=null;
+      setTimeout(typeNext,speed*3);
+    }
+  }
+  setTimeout(typeNext,500);
+})();
 </script>
 </body>
 </html>
