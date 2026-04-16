@@ -234,8 +234,11 @@ document.querySelectorAll('.ta-overlay').forEach(function(ov) {
   });
 });
 
+var TAG_ORDER = ['顾客体验', '员工体验', '业务达成', '其他'];
+
 function buildGuide(blockId, tags) {
-  var dims = tags.flatMap(function(t) { return GUIDE_MAP[t] || []; });
+  var sorted = TAG_ORDER.filter(function(t) { return tags.indexOf(t) !== -1; });
+  var dims = sorted.flatMap(function(t) { return GUIDE_MAP[t] || []; });
   return '您可以从' + dims.join('、') + BLOCK_SUFFIX[blockId];
 }
 

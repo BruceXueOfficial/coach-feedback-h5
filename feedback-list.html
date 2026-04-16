@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>查看教练反馈记录</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--y:#FFBC0D;--r:#DA291C;--dk:#292929;--g5:#888;--g4:#AAA;--g2:#E5E5E5;--g1:#F5F5F5;--bg:#F2F2F2;--w:#FFF;--gn:#34A853;--f:'PingFang SC',-apple-system,BlinkMacSystemFont,'Helvetica Neue','Microsoft YaHei',sans-serif;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{font-family:var(--f);background:var(--bg);color:var(--dk);line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased}
+.status-bar{height:calc(44px + var(--st));padding-top:var(--st);background:var(--y);position:sticky;top:0;z-index:100}
+.nav{background:var(--y);padding:0 16px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:calc(44px + var(--st));z-index:99}
+.nav-back{display:flex;align-items:center;gap:4px;background:none;border:none;font-size:17px;font-weight:600;color:var(--dk);cursor:pointer;padding:8px 4px;font-family:var(--f)}
+.nav-back svg{width:20px;height:20px}
+.nav-acts{display:flex;gap:12px}
+.nav-btn{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.08);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.nav-btn svg{width:18px;height:18px}
+.list{padding:0 0 calc(20px + var(--sb))}
+.item{background:var(--w);padding:16px 20px;border-bottom:1px solid var(--g2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.item:active{background:var(--g1)}
+.item:first-child{border-top:1px solid var(--g2)}
+.item-left{flex:1;min-width:0}
+.item-num{display:inline-block;background:var(--r);color:var(--w);font-size:12px;font-weight:700;padding:1px 8px;border-radius:4px;margin-bottom:6px;font-family:var(--f)}
+.item-title{font-size:16px;font-weight:600;color:var(--dk);margin-bottom:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.item-tag{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:4px;border:1px solid;vertical-align:middle}
+.item-tag--am{color:var(--gn);border-color:var(--gn)}
+.item-tag--pm{color:var(--g5);border-color:var(--g4)}
+.item-tag--full{color:var(--gn);border-color:var(--gn)}
+.item-coach{font-size:13px;color:var(--g5)}
+.item-arrow{flex-shrink:0;margin-left:12px;color:var(--g4)}
+.item-arrow svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div class="status-bar"></div>
+<nav class="nav">
+  <button class="nav-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>查看教练反馈记录</button>
+  <div class="nav-acts">
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+    <button class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></button>
+  </div>
+</nav>
+<div class="list" id="list"></div>
+<script>
+var data=[
+  {num:'01',date:'2025.08.06',shift:'早班',shiftType:'am',coach:'张建宇'},
+  {num:'02',date:'2025.08.06',shift:'晚班',shiftType:'pm',coach:'张建宇'},
+  {num:'03',date:'2025.08.07',shift:'通宵班',shiftType:'full',coach:'张建宇'},
+  {num:'04',date:'2025.08.08',shift:'晚班',shiftType:'pm',coach:'张建宇'},
+  {num:'05',date:'2025.08.09',shift:'早班',shiftType:'am',coach:'张建宇'},
+  {num:'06',date:'2025.08.09',shift:'晚班',shiftType:'pm',coach:'张建宇'},
+  {num:'07',date:'2025.08.10',shift:'早班',shiftType:'am',coach:'张建宇'},
+  {num:'08',date:'2025.08.10',shift:'晚班',shiftType:'pm',coach:'张建宇'},
+  {num:'09',date:'2025.08.11',shift:'早班',shiftType:'am',coach:'张建宇'},
+  {num:'10',date:'2025.08.12',shift:'早班',shiftType:'am',coach:'张建宇'}
+];
+var list=document.getElementById('list');
+data.forEach(function(d){
+  var tagClass=d.shiftType==='am'?'item-tag--am':d.shiftType==='full'?'item-tag--full':'item-tag--pm';
+  var html='<div class="item"><div class="item-left">'
+    +'<div class="item-num">'+d.num+'</div>'
+    +'<div class="item-title">'+d.date+'教练反馈报告 <span class="item-tag '+tagClass+'">'+d.shift+'</span></div>'
+    +'<div class="item-coach">教练：'+d.coach+'</div>'
+    +'</div><div class="item-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div></div>';
+  list.insertAdjacentHTML('beforeend',html);
+});
+</script>
+</body>
+</html>
